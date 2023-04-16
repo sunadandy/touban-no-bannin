@@ -1,8 +1,8 @@
 <template>
-    <v-main class="top">
+    <div class="top">
         <router-link to="/home" @click="RingAudio()">当番の番人</router-link>
-        <br>※クリック音が鳴ります
-    </v-main>
+        <br>※注意！！クリック時にが鳴ります！！
+    </div>
 </template>
 
 <script>
@@ -19,13 +19,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-h2 {
-text-align: center;
-}
-.app {
-width: 900px;
-margin: auto;
-}
-</style>
