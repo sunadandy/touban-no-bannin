@@ -1,8 +1,7 @@
 <template>
   <div class="setting">
     <!-- 子コンポーネントの関数をrefで呼ぶための記述 -->
-    <person-manager ref="pm"></person-manager>
-    <setting-validation ref="sv"></setting-validation>
+    <person-manager ref="RefPersonManager"></person-manager>
     
     <v-card class="setting-vcard">
       <v-toolbar
@@ -63,7 +62,7 @@
           <v-window-item value="option-1">
             <v-card flat>
               <v-card-text>
-                <input-text-field v-bind:hint='hint'/>
+                <input-text-field ref="RefInputField" v-bind:hint='hint'/>
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -72,7 +71,6 @@
               <select
                 title="メンバーを選択してください"
                 class="multi"
-                id="multi"
                 multiple="multiple"
                 size="20"
                 >
@@ -83,35 +81,38 @@
           <v-window-item value="option-3">
             <v-card flat>
               <v-card-text>
-                <schedule-setting/>
+                <schedule-setting ref="RefSchedule"/>
               </v-card-text>
             </v-card>
           </v-window-item>
           <v-window-item value="option-4">
             <v-card flat>
-              <message-setting/>
+              メンバーに伝えたいメッセージを入力してください。(サーバの参照資料等)<br>
+              <input-text-area ref="RefInputArea"/>
             </v-card>
           </v-window-item>
           <v-window-item value="option-5">
             <v-card flat>
-              <drag-drop-swap v-bind:dataList="member"/>
+              ※注意※　更新すると元の順番には戻せません。<br>
+              <!-- オリジナルを渡すとスワップ時にオリジナルまでスワップされるのでコピーを渡す -->
+              <drag-drop-swap ref="RefDragDropSwap" v-bind:dataList="member.concat()"/>
             </v-card>
           </v-window-item>
           <v-window-item value="option-6">
             <v-card flat>
-              <owner-setting v-bind:memberList="member"/>
+              <owner-setting v-bind:memberList="member" ref="RefOwner"></owner-setting>
             </v-card>
           </v-window-item>
           <v-window-item value="option-7">
             <v-card flat>
-              <mail-setting/>
+              <mail-setting ref="RefMail"/>
             </v-card>
           </v-window-item>
         </v-window>
       </div>
     </v-card>
     <v-btn flat rounded="pill" color="primary" @click="PageBack()">戻る</v-btn>
-    <v-btn flat rounded="pill" color="primary" @click="Update()" v-if="show == true">更新</v-btn>
+    <v-btn flat rounded="pill" color="primary" @click="Update(tab)" v-if="show == true">更新</v-btn>
     <setting-register v-if="show == false" @CbkRegister="CbkRegister"/>
   </div>
 </template>
@@ -121,13 +122,12 @@
 import PersonManager from '@/components/model/PersonManager'
 import SettingRegister from '@/components/view/SettingRegister'
 import MailSetting from '@/components/view/VTabMailSetting'
-import MessageSetting from '@/components/view/VTabMessageSetting'
+// import MessageSetting from '@/components/view/VTabMessageSetting'
 import ScheduleSetting from '@/components/view/VTabScheduleSetting'
 import OwnerSetting from '@/components/view/VTabOwnerSetting'
 import DragDropSwap from '@/components/design/DragDropSwap'
 import InputTextField from '@/components/design/InputTextField'
-import SettingValidation from '@/components/model/SettingValidation'
-import { callWithAsyncErrorHandling } from 'vue'
+import InputTextArea from '@/components/design/InputTextArea'
 
 export default {
   name: 'Setting',
@@ -135,12 +135,12 @@ export default {
     PersonManager,
     SettingRegister,
     MailSetting,
-    MessageSetting,
+    // MessageSetting,
     ScheduleSetting,
     OwnerSetting,
     DragDropSwap,
     InputTextField,
-    SettingValidation,
+    InputTextArea,
   },
   data(){
     return {
@@ -148,7 +148,7 @@ export default {
       tab: 'option-2',
       selectable: [],
       employeeNoList: [],
-      toubanInfo: ["name", "member", "message", "owner", "deleteKey"],
+      toubanInfo: ["ID", "name", "member", "message", "owner", "deleteKey"],
       member: ["A", "B", "C", "D"],
       show: true,
       hint: "当番名を設定してください",
@@ -166,12 +166,7 @@ export default {
           this.toubanInfo["owner"] = param["owner"]
           this.toubanInfo["deleteKey"] = param["deleteKey"]
           // multiselectedから選択済み要素を格納
-          const selected = document.getElementById("m-selected")
-          var array = []
-          for ( var i=0,l=selected.length; l>i; i++ ) {
-            array.push(selected[i].value)
-          }
-          this.toubanInfo["member"] = array
+          this.StoreSelected()
           
           // リダイレクト
           this.$router.push("/home")
@@ -180,17 +175,65 @@ export default {
       }
       alert("データベースに存在しない社員番号です。")
     },
-    Update(){
-      switch(this.tab){
-        // 当番名は空白でもOKなのでバリデーションなし
-        // case "option-1":
+    // multiselectedから選択済み要素を格納
+    StoreSelected(){
+      const selected = document.getElementById("m-selected")
+      var array = []
+      for ( var i=0,l=selected.length; l>i; i++ ) {
+        array.push(selected[i].value)
+      }
+      this.toubanInfo.member = array
+    },
+    Register(){
+      // Update時の1つ1つの処理を全て実施すればいい
+      Update("option-1")
+      Update("option-2")
+      Update("option-3")
+      Update("option-4")
+      Update("option-7")
+    },
+    Update(tab){
+      var ret
+      switch(tab){
+        // 当番名
+        case "option-1":
+          this.toubanInfo.name = this.$refs.RefInputField.inputData
+          break
+        // メンバー編集
         case "option-2":
-          this.$refs.sv.Validate(this.toubanInfo.name)
+          this.StoreSelected()
+          break
+          // スケジュール設定
         case "option-3":
+          var interval = this.$refs.RefSchedule.interval
+          var startDate = this.$refs.RefSchedule.date
+          break
+        // メッセージ設定
         case "option-4":
+          this.toubanInfo.message = this.$refs.RefInputArea.inputData
+          break
+          // 順番変更
         case "option-5":
+          console.log(this.member)
+          this.member = this.$refs.RefDragDropSwap.dataList.concat()
+          console.log(this.member)
+          break
+        // オーナー変更
         case "option-6":
+          var data = this.$refs.RefOwner.GetData()
+          var nextOwner = data.nextOwner
+          var deleteKey = data.newKey
+          if(nextOwner != null && deleteKey != null){
+            this.toubanInfo.owner = nextOwner
+            this.toubanInfo.deleteKey = deleteKey
+          }else{
+            alert("変更先オーナーもしくは削除キーの未設定です。")
+          }
+          break
+        // メール配信設定
         case "option-7":
+          var data = this.$refs.RefMail.GetMailSetting()
+          break
       }
     }
   },
@@ -201,8 +244,8 @@ export default {
       this.show = false
     }
     // アドレス帳からデータ取得
-    this.selectable = this.$refs.pm.Members()
-    this.employeeNoList = this.$refs.pm.EmployeeNo()
+    this.selectable = this.$refs.RefPersonManager.Members()
+    this.employeeNoList = this.$refs.RefPersonManager.EmployeeNo()
     
     // DOMの更新を待ってから処理。nextTickがないとメンバーが表示されない
     this.$nextTick(function() {

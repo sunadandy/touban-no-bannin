@@ -1,18 +1,16 @@
 <template>
-  <div class="message-form">
+  <div>
     <v-textarea
-      name="input-7-1"
-      :hint='hint'
-      persistent-hint
       variant="outlined"
-      auto-grow
+      clearable
+      v-model="inputData"
     ></v-textarea>
   </div>
 </template>
   
 <script>
 export default {
-  name: 'InputTextArea',
+  name: "InputTextArea",
   data(){
     return{
       inputData: "",

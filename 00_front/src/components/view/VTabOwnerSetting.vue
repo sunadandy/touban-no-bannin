@@ -1,13 +1,14 @@
 <template>
   <div class="vtab-setting">
     <v-select
-      v-model="nextOwner"
+      v-model='data.nextOwner'
       :items="memberList"
       hint="オーナー変更先を選んでください"
       persistent-hint
       variant="outlined"
     ></v-select>
-    <input-text-field v-bind:hint='hint'/>
+    <!-- <input-text-field v-bind:hint='hint' @CbkChangeText="CbkChangeText"/> -->
+    <input-text-field v-bind:hint='hint' ref="RefTextField"/>
   </div>
 </template>
 
@@ -21,8 +22,7 @@ export default {
   },
   data(){
     return{
-      nextOwner: "",
-      newkey: "",
+      data: {newKey: null, nextOwner: null},
       hint: "新しい削除キーを設定してください。",
     }
   },
@@ -30,6 +30,12 @@ export default {
     memberList:{
       type: Array,
       require: true
+    }
+  },
+  methods:{
+    GetData(){
+      this.data.newKey = this.$refs.RefTextField.inputData
+      return this.data
     }
   }
 }
