@@ -148,8 +148,8 @@ export default {
       tab: 'option-2',
       selectable: [],
       employeeNoList: [],
-      toubanInfo: ["ID", "name", "member", "message", "owner", "deleteKey"],
-      member: ["A", "B", "C", "D"],
+      toubanInfo: ["ID", "name", "message", "owner", "deleteKey"],
+      member: ["toubanID", ["A", "B", "C", "D"]],
       show: true,
       hint: "当番名を設定してください",
     }

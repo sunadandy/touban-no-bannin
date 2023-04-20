@@ -22,8 +22,19 @@
         </v-table>
       </v-row>
     </div>
-    <div class="new">
-      <router-link to="/create">新規作成</router-link>
+    <div class="create">
+      <v-btn
+        :disabled="loading"
+        :loading="loading"
+        block
+        class="text-none mb-4"
+        color="indigo-darken-1"
+        size="large"
+        variant="flat"
+        @click="Create(key)"
+      >
+      新規作成
+      </v-btn>
     </div>
   </div>
 </template>
@@ -53,6 +64,9 @@ export default {
       console.log(key)
       // this.$router.push({name: "RoomView", params: {id: key}})
     },
+    Create: function() {
+      this.$router.push("/create")
+    },
   }
 }
 </script>
@@ -67,6 +81,7 @@ export default {
       padding: 20px 0px;
   }
   .touban-table {
-      margin: auto 10px;
+    margin: auto 10px;
+    margin-bottom: 20px;
   }
 </style>
