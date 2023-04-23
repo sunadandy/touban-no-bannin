@@ -27,13 +27,13 @@
         </thead>
         <tbody>
           <tr
-            v-for="item in items" :key="item.name"
-            v-bind:class="item.owner ? 'coloring' : ''"
+            v-for="m in member" :key="m.order"
+            v-bind:class="m.owner ? 'coloring' : ''"
           >
-            <td>{{ item.id }}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.lasted }}</td>
-            <td>{{ item.next }}</td>
+            <td>{{ m.order }}</td>
+            <td>{{ m.name }}</td>
+            <td>{{ m.last }}</td>
+            <td>{{ m.next }}</td>
           </tr>
         </tbody>
       </v-table>
@@ -45,13 +45,13 @@
 export default {
   name: 'ShowView',
   data(){
-    return{
-      items: [
-        {id: 0, name: "A", lasted: "2023/4/1", next: "2023/5/1", owner: false},
-        {id: 1, name: "B", lasted: "2023/5/2", next: "2023/5/2", owner: true},
-    ],
-      message: "",
+    return {
+      member: []
     }
+  },
+  mounted(){
+    var urlPathId = this.$route.params.id
+    this.member = this.$store.getters.GetOrderByID(urlPathId)
   }
 }
 </script>

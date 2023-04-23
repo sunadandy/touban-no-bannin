@@ -11,7 +11,7 @@
         @dragenter="dragEnter($event, index)"
         @dragover.prevent
       >
-        {{ data }}
+        {{ data.name }}
       </li>
     </ul>
   </div>
@@ -28,7 +28,8 @@ export default {
   props:{
     dataList:{
       type: Array,
-      require: true
+      required: true,
+      default: () => [],
     }
   },
   methods:{

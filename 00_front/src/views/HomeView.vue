@@ -11,8 +11,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(touban, key) in toubans" :key="touban.id">
-              <td class="touban-name">{{ touban.name }}</td>
+            <tr v-for="(touban, key) in this.$store.state.currenToubanTable" :key="touban.id">
+              <td class="touban-name">{{ touban.title }}</td>
               <td class="touban-owner">{{ touban.owner }}</td>
               <td><v-btn flat :rounded="0" color="success" @click="Show(key)">覗く</v-btn></td>
               <td><v-btn flat :rounded="0" color="success" @click="Edit(key)">編集</v-btn></td>
@@ -42,17 +42,6 @@
 <script>
 export default {
   name: 'HomeView',
-  data: function() {
-    return {
-      toubans: []
-    }
-  },
-  mounted: function(){
-    this.toubans = [
-        {"id": 0, "name": "test1", "owner": "yamada"},
-        {"id": 1, "name": "test2", "owner": "tanaka"},
-    ]
-  },
   methods: {
     Show: function(key) {
       this.$router.push({name: "show", params: {id: key}})

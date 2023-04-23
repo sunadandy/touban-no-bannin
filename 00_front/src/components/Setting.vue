@@ -1,8 +1,5 @@
 <template>
   <div class="setting">
-    <!-- 子コンポーネントの関数をrefで呼ぶための記述 -->
-    <person-manager ref="RefPersonManager"></person-manager>
-    
     <v-card class="setting-vcard">
       <v-toolbar
         color="primary"
@@ -39,13 +36,13 @@
             </v-icon>
             メッセージ
           </v-tab>
-          <v-tab value="option-5" v-if="show == true">
+          <v-tab value="option-5" v-if="limited == false">
             <v-icon start>
               mdi-swap-horizontal
             </v-icon>
             順番変更
           </v-tab>
-          <v-tab value="option-6" v-if="show == true">
+          <v-tab value="option-6" v-if="limited == false">
             <v-icon start>
               mdi-account-switch
             </v-icon>
@@ -68,14 +65,7 @@
           </v-window-item>
           <v-window-item value="option-2">
             <v-card flat>
-              <select
-                title="メンバーを選択してください"
-                class="multi"
-                multiple="multiple"
-                size="20"
-                >
-                <option v-for="name in selectable" :key="name">{{ name }}</option>
-              </select>
+              <member-select ref="RefMemberSelect"/>
             </v-card>
           </v-window-item>
           <v-window-item value="option-3">
@@ -93,7 +83,7 @@
           </v-window-item>
           <v-window-item value="option-5">
             <v-card flat>
-              ※注意※　更新すると元の順番には戻せません。<br>
+              ※注意※  更新すると元の順番には戻せません。<br>
               <!-- オリジナルを渡すとスワップ時にオリジナルまでスワップされるのでコピーを渡す -->
               <drag-drop-swap ref="RefDragDropSwap" v-bind:dataList="member.concat()"/>
             </v-card>
@@ -111,20 +101,15 @@
         </v-window>
       </div>
     </v-card>
-    <v-btn flat rounded="pill" color="primary" @click="PageBack()">戻る</v-btn>
-    <v-btn flat rounded="pill" color="primary" @click="Update(tab)" v-if="show == true">更新</v-btn>
-    <setting-register v-if="show == false" @CbkRegister="CbkRegister"/>
+    <v-btn flat rounded="pill" color="primary" @click="PageBack">戻る</v-btn>
   </div>
 </template>
 
 <script>
-// import jQuery from 'jquery' //インポートししなくていいっぽい
-import PersonManager from '@/components/model/PersonManager'
-import SettingRegister from '@/components/view/SettingRegister'
 import MailSetting from '@/components/view/VTabMailSetting'
-// import MessageSetting from '@/components/view/VTabMessageSetting'
 import ScheduleSetting from '@/components/view/VTabScheduleSetting'
 import OwnerSetting from '@/components/view/VTabOwnerSetting'
+import MemberSelect from '@/components/view/VTabMemberSelect'
 import DragDropSwap from '@/components/design/DragDropSwap'
 import InputTextField from '@/components/design/InputTextField'
 import InputTextArea from '@/components/design/InputTextArea'
@@ -132,12 +117,10 @@ import InputTextArea from '@/components/design/InputTextArea'
 export default {
   name: 'Setting',
   components: {
-    PersonManager,
-    SettingRegister,
     MailSetting,
-    // MessageSetting,
     ScheduleSetting,
     OwnerSetting,
+    MemberSelect,
     DragDropSwap,
     InputTextField,
     InputTextArea,
@@ -146,67 +129,63 @@ export default {
     return {
       // [Issue]本当はoption-1にしたいが、1にするとmultiselectがレンダリングされない
       tab: 'option-2',
-      selectable: [],
-      employeeNoList: [],
-      toubanInfo: ["ID", "name", "message", "owner", "deleteKey"],
-      member: ["toubanID", ["A", "B", "C", "D"]],
-      show: true,
+      toubanInfo: ["id", "title", "owner", "start", "interval_type", "mail", "remind_type", "message", "password"],
+      member: [],   //memberInfoを格納する配列
+      memberInfo: ["toubanID", "name", "employeeNo", "order", "last", "next"],
       hint: "当番名を設定してください",
+      result: ["data", "status"]
+    }
+  },
+  props:{
+    // タブの表示非表示を制御するためのパラメータ
+    limited:{
+      type: Boolean,
+      require: true,
+      default: () => false,
     }
   },
   methods: {
     PageBack(){
       this.$router.push("/home")
     },
-    CbkRegister(param){
-      // 社員番号の一致チェック
-      for(var i=0; i<this.employeeNoList.length; i++){
-        if(this.employeeNoList[i] == param["owner"]){
-          // オーナーと削除キーの格納
-          this.toubanInfo["owner"] = param["owner"]
-          this.toubanInfo["deleteKey"] = param["deleteKey"]
-          // multiselectedから選択済み要素を格納
-          this.StoreSelected()
-          
-          // リダイレクト
-          this.$router.push("/home")
-          return true //$emitはリターンを扱わないから飾り。とはいえ、breakと違って処理が終了する
-        }
+    Validation(){
+      if(this.limited == true){
+        ValidationAll()
+      }else{
+        this.ValidationIndividual(this.tab)
       }
-      alert("データベースに存在しない社員番号です。")
+      return this.result
     },
-    // multiselectedから選択済み要素を格納
-    StoreSelected(){
-      const selected = document.getElementById("m-selected")
-      var array = []
-      for ( var i=0,l=selected.length; l>i; i++ ) {
-        array.push(selected[i].value)
-      }
-      this.toubanInfo.member = array
+    ValidationAll(){
+      this.ValidationIndividual("option-1")
+      this.ValidationIndividual("option-2")
+      this.ValidationIndividual("option-3")
+      this.ValidationIndividual("option-4")
+      this.ValidationIndividual("option-7")
     },
-    Register(){
-      // Update時の1つ1つの処理を全て実施すればいい
-      Update("option-1")
-      Update("option-2")
-      Update("option-3")
-      Update("option-4")
-      Update("option-7")
-    },
-    Update(tab){
-      var ret
+    ValidationIndividual(tab){
       switch(tab){
         // 当番名
         case "option-1":
-          this.toubanInfo.name = this.$refs.RefInputField.inputData
+          var data = {}
+          data["title"] = this.$refs.RefInputField.inputData
+          this.result.data = data
+          this.result.status = "OK"
           break
         // メンバー編集
         case "option-2":
-          this.StoreSelected()
+          var data = {}
+          // memberプロパティに選択要素を格納
+          data = this.$refs.RefMemberSelect.GetSelected()
+          this.result.data = data
+          this.result.status = "OK"
           break
-          // スケジュール設定
+        // スケジュール設定
         case "option-3":
           var interval = this.$refs.RefSchedule.interval
           var startDate = this.$refs.RefSchedule.date
+          this.toubanInfo.interval_type = interval
+          this.toubanInfo.start = startDate
           break
         // メッセージ設定
         case "option-4":
@@ -214,9 +193,7 @@ export default {
           break
           // 順番変更
         case "option-5":
-          console.log(this.member)
-          this.member = this.$refs.RefDragDropSwap.dataList.concat()
-          console.log(this.member)
+          this.memberInfo = this.$refs.RefDragDropSwap.dataList.concat()
           break
         // オーナー変更
         case "option-6":
@@ -227,34 +204,16 @@ export default {
             this.toubanInfo.owner = nextOwner
             this.toubanInfo.deleteKey = deleteKey
           }else{
-            alert("変更先オーナーもしくは削除キーの未設定です。")
+            alert("変更先オーナーもしくはパスワードの未設定です。")
           }
           break
         // メール配信設定
         case "option-7":
           var data = this.$refs.RefMail.GetMailSetting()
+          this.toubanInfo.mail = data
           break
       }
     }
-  },
-  mounted(){
-    // URLによるタブの可視化制御のための処理
-    const urlpath = this.$route.path
-    if(urlpath == "/create"){
-      this.show = false
-    }
-    // アドレス帳からデータ取得
-    this.selectable = this.$refs.RefPersonManager.Members()
-    this.employeeNoList = this.$refs.RefPersonManager.EmployeeNo()
-    
-    // DOMの更新を待ってから処理。nextTickがないとメンバーが表示されない
-    this.$nextTick(function() {
-      // MultiSelectedTableのマウント
-      $('.multi').multiselectable({
-        selectableLabel: '選択可能一覧',
-        selectedLabel: '選択済み',
-      });
-    });
   },
 }
 </script>

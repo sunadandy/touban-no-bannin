@@ -44,7 +44,6 @@ export default {
         return [this.model, null, null]
       }else{
         var cc = this.$refs.RefInputField.inputData
-        console.log(cc)
         return [this.model, this.remindDate, cc]
       }
     }

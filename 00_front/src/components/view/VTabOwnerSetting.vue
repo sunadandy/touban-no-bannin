@@ -2,7 +2,7 @@
   <div class="vtab-setting">
     <v-select
       v-model='data.nextOwner'
-      :items="memberList"
+      :items="memberList.name"
       hint="オーナー変更先を選んでください"
       persistent-hint
       variant="outlined"
@@ -22,19 +22,21 @@ export default {
   },
   data(){
     return{
-      data: {newKey: null, nextOwner: null},
-      hint: "新しい削除キーを設定してください。",
+      NameOnlyList: [],
+      data: {newPassword: null, nextOwner: null},
+      hint: "新しいパスワードを設定してください。",
     }
   },
   props:{
     memberList:{
       type: Array,
-      require: true
+      required: true,
+      default: () => [],
     }
   },
   methods:{
     GetData(){
-      this.data.newKey = this.$refs.RefTextField.inputData
+      this.data.newPassword = this.$refs.RefTextField.inputData
       return this.data
     }
   }

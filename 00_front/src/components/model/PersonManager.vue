@@ -4,31 +4,23 @@
 </template>
   
 <script>
-import memberInfo from "@/assets/address.csv"
+import csvData from "@/assets/address.csv"
 
 export default {
   name: 'PersonManager',
   data() {
     return {
-      emplyoeeNo: [],   //社員番号
-      name: [],         //氏名
-      address: [],      //メールアドレス
-      memberInfo: memberInfo,
+      csvData: csvData,
+      userData: [],
     };
   },
-  methods: {
-    Members(){
-      return this.name
-    },
-    EmployeeNo(){
-      return this.emplyoeeNo
-    }
-  },
   mounted(){
-    for(var i=0, l=this.memberInfo.length; i < l; i++){
-      this.emplyoeeNo.push(memberInfo[i][3])
-      this.name.push(memberInfo[i][4])
-      this.address.push(memberInfo[i][5])
+    for(var i=0, l=this.csvData.length; i < l; i++){
+      var item = {}
+      item["emplyoeeNo"] = this.csvData[i][3]
+      item["name"] = this.csvData[i][4]
+      item["email"] = this.csvData[i][5]
+      this.userData.push(item)
     }
   }
 };
