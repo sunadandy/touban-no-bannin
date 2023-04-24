@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 	"touban/model"
 
 	"github.com/gin-gonic/gin"
@@ -36,4 +37,11 @@ func PostTouban(c *gin.Context) {
 func AddTouban(accessT AccessTouban) (int, error) {
 	id, err := accessT.CreateTouban()
 	return id, err
+}
+
+func DeleteTouban(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		model.DeleteTouban(id)
+	}
 }

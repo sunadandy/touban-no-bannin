@@ -25,12 +25,42 @@ export default {
   },
   methods:{
     Update(){
+      var currentTab = this.$refs.RefSetting.tab
       // 更新前チェックとデータの取得
       var result = this.$refs.RefSetting.Validation()
       if(result.status == "OK"){
         result.data
-      // }else{
-        
+      }else{
+        alert("${currentTab}の設定が正しくありません")
+      }
+
+      // データベース更新
+      switch(tab){
+        // 当番名
+        case "option-1":
+          this.axios.post("/touban", data)
+          .then(response => {
+            console.log(response)
+          }).catch(error => console.log(error))
+          break
+        // メンバー編集
+        case "option-2":
+          break
+        // スケジュール設定
+        case "option-3":
+          break
+        // メッセージ設定
+        case "option-4":
+          break
+          // 順番変更
+        case "option-5":
+          break
+        // オーナー変更
+        case "option-6":
+          break
+        // メール配信設定
+        case "option-7":
+          break
       }
     }
   },

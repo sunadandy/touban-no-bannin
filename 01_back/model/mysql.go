@@ -94,6 +94,22 @@ func ReadTouban() string {
 	return string(jsonData)
 }
 
+// func ReadToubanByID(id int) StTouban {
+// 	stTouban := StTouban{}
+// 	// IDでフィルタリングして取得
+// 	db.Table(toubanTbl).Where("id = ?", id).Find(&stTouban)
+// 	return stTouban
+// }
+
+func (stTouban StTouban) UpdateTouban() {
+	id := stTouban.Id
+	db.Table(toubanTbl).Where("id = ?", id).Update(&stTouban)
+}
+
+func DeleteTouban(id int) {
+	db.Table(toubanTbl).Where("id = ?", id).Delete(&StTouban{})
+}
+
 // ---------------------------------------------------------------
 // 順番テーブルCRUD
 // ---------------------------------------------------------------

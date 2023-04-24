@@ -14,6 +14,7 @@ func main() {
 	router := gin.Default()
 	router.GET("/touban", controller.GetTouban)
 	router.POST("/touban", controller.PostTouban)
+	router.DELETE("/touban", controller.DeleteTouban)
 	router.GET("/order", controller.GetOrder)
 	router.POST("/order", controller.PostOrder)
 	router.Run(":3000")
