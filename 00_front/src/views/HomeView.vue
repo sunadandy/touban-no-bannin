@@ -11,12 +11,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(touban, key) in this.$store.state.currenToubanTable" :key="touban.id">
+            <tr v-for="(touban, index) in this.$store.state.currenToubanTable" :key="index">
               <td class="touban-name">{{ touban.title }}</td>
               <td class="touban-owner">{{ touban.owner }}</td>
-              <td><v-btn flat :rounded="0" color="success" @click="Show(key)">覗く</v-btn></td>
-              <td><v-btn flat :rounded="0" color="success" @click="Edit(key)">編集</v-btn></td>
-              <td><v-btn flat :rounded="0" color="success" @click="Delete(key)">削除</v-btn></td>
+              <td><v-btn flat :rounded="0" color="success" @click="Show(touban.id)">覗く</v-btn></td>
+              <td><v-btn flat :rounded="0" color="success" @click="Edit(touban.id)">編集</v-btn></td>
+              <td><v-btn flat :rounded="0" color="success" @click="Delete(touban.id)">削除</v-btn></td>
             </tr>
           </tbody>
         </v-table>
@@ -43,15 +43,17 @@
 export default {
   name: 'HomeView',
   methods: {
-    Show: function(key) {
-      this.$router.push({name: "show", params: {id: key}})
+    Show: function(id) {
+      this.$router.push({name: "show", params: {id: id}})
     },
-    Edit: function(key) {
-      this.$router.push({name: "edit", params: {id: key}})
+    Edit: function(id) {
+      this.$router.push({name: "edit", params: {id: id}})
     },
-    Delete: function(key) {
-      console.log(key)
-      // this.$router.push({name: "RoomView", params: {id: key}})
+    Delete: function(id) {
+      // 当番テーブルから該当するキーのレコードを削除
+      this.axios.delete("/touban", {params: {id: id}})
+      // 順番テーブルから当番IDが一致するレコードを削除
+      this.axios.delete("/order", {params: {id: id}})
     },
     Create: function() {
       this.$router.push("/create")

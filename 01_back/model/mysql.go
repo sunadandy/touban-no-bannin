@@ -70,40 +70,31 @@ func NewOrders() Orders {
 // ---------------------------------------------------------------
 // 当番テーブルCRUD
 // ---------------------------------------------------------------
-func (stTouban StTouban) CreateTouban() (int, error) {
+func (stTouban StTouban) CreateTouban() error {
 	err := db.Table(toubanTbl).Create(&stTouban).Error
 	if err != nil {
-		return -1, err
+		print(err)
+		return err
 	}
-
-	// 追加されたレコードのIDを取得
-	var maxID int
-	if err = db.Table(toubanTbl).Select("max(id)").Scan(&maxID).Error; err != nil {
-		panic(err)
-	}
-	return maxID, nil
+	return nil
 }
 
-func ReadTouban() string {
+func ReadTouban() (string, error) {
 	stToubans := []StTouban{}
 	db.Table(toubanTbl).Find(&stToubans)
 	jsonData, err := json.Marshal(&stToubans)
 	if err != nil {
 		print(err)
+		return "", err
 	}
-	return string(jsonData)
+	return string(jsonData), nil
 }
 
-// func ReadToubanByID(id int) StTouban {
-// 	stTouban := StTouban{}
-// 	// IDでフィルタリングして取得
-// 	db.Table(toubanTbl).Where("id = ?", id).Find(&stTouban)
-// 	return stTouban
-// }
-
-func (stTouban StTouban) UpdateTouban() {
+func (stTouban StTouban) UpdateTouban() int64 {
 	id := stTouban.Id
-	db.Table(toubanTbl).Where("id = ?", id).Update(&stTouban)
+	result := db.Table(toubanTbl).Where("id = ?", id).Update(&stTouban)
+	// Updateはエラーを返さないので更新された行数で成否を判断
+	return result.RowsAffected
 }
 
 func DeleteTouban(id int) {
@@ -133,6 +124,10 @@ func ReadOrder() string {
 
 func (stOrder StOrder) UpdateOrder() error {
 	return nil
+}
+
+func DeleteOrder(refId int) {
+	db.Table(toubanTbl).Where("toubanId = ?", refId).Delete(&StOrder{})
 }
 
 // func ReadOrderByToubanID(id string) string {

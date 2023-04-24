@@ -28,7 +28,7 @@
         <tbody>
           <tr
             v-for="m in member" :key="m.order"
-            v-bind:class="m.owner ? 'coloring' : ''"
+            v-bind:class="m.name == owner ? 'coloring' : ''"
           >
             <td>{{ m.order }}</td>
             <td>{{ m.name }}</td>
@@ -46,11 +46,17 @@ export default {
   name: 'ShowView',
   data(){
     return {
-      member: []
+      member: [],
+      owner: ""
     }
   },
   mounted(){
     var urlPathId = this.$route.params.id
+    var toubanInfo = {}
+    // オーナーの取得
+    toubanInfo = this.$store.getters.GetToubanByID(urlPathId)
+    this.owner = toubanInfo[0].owner  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
+    // メンバーの取得
     this.member = this.$store.getters.GetOrderByID(urlPathId)
   }
 }

@@ -19,7 +19,7 @@ export default {
       var item = {}
       item["emplyoeeNo"] = this.csvData[i][3]
       item["name"] = this.csvData[i][4]
-      item["email"] = this.csvData[i][5]
+      item["email"] = this.csvData[i][6]
       this.userData.push(item)
     }
   }

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 	"touban/model"
 
 	"github.com/gin-gonic/gin"
@@ -40,4 +41,13 @@ func PostOrder(c *gin.Context) {
 func AddOrder(accessO AccessOrder) error {
 	err := accessO.CreateOrder()
 	return err
+}
+
+func DeleteOrder(c *gin.Context) {
+	idStr := c.Query("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		print("Invalid ID")
+	}
+	model.DeleteTouban(id)
 }

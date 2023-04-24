@@ -7,6 +7,9 @@ export default createStore({
     currentOrderTable:[],
   },
   getters: {
+    GetToubanByID: (state) => (id) => {
+      return state.currenToubanTable.filter(item => item.id == id)
+    },
     GetOrderByID: (state) => (id) => {
       return state.currentOrderTable.filter(item => item.toubanId == id)
     }

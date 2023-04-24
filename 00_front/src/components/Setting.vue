@@ -167,8 +167,8 @@ export default {
       switch(tab){
         // 当番名
         case "option-1":
-          var data = {}
-          data["title"] = this.$refs.RefInputField.inputData
+          var data = ""
+          data = this.$refs.RefInputField.inputData
           this.result.data = data
           this.result.status = "OK"
           break

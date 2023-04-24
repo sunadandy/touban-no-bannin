@@ -9,39 +9,62 @@ import (
 )
 
 type AccessTouban interface {
-	CreateTouban() (int, error)
+	CreateTouban() error
+	UpdateTouban() int64
 }
 
 func GetTouban(c *gin.Context) {
-	jsonData := model.ReadTouban()
+	jsonData, _ := model.ReadTouban()
 	c.String(http.StatusOK, jsonData)
 }
 
 func PostTouban(c *gin.Context) {
-	stTouban := model.NewTouban() //当番構造体を配列で取得
-	var id int
+	stTouban := model.NewTouban()
 	var err error
 
-	err = c.ShouldBindJSON(&stTouban)
 	// POSTで受け取ったJSONを構造体にマッピング
+	err = c.ShouldBindJSON(&stTouban)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 	// データベースに追加
-	id, err = AddTouban(stTouban)
+	err = AddTouban(stTouban)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{"data": id})
+	c.JSON(http.StatusOK, gin.H{"data": "Success!"})
 }
-func AddTouban(accessT AccessTouban) (int, error) {
-	id, err := accessT.CreateTouban()
-	return id, err
+func AddTouban(accessT AccessTouban) error {
+	err := accessT.CreateTouban()
+	return err
+}
+
+func PutTouban(c *gin.Context) {
+	stTouban := model.NewTouban()
+
+	// POSTで受け取ったJSONを構造体にマッピング
+	err := c.ShouldBindJSON(&stTouban)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	// レコード更新
+	changedColumns := UpdateTouban(stTouban)
+	if changedColumns != 0 {
+		c.JSON(http.StatusOK, gin.H{"data": "Success!"})
+	}
+	// c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+}
+func UpdateTouban(accessT AccessTouban) int64 {
+	ret := accessT.UpdateTouban()
+	return ret
 }
 
 func DeleteTouban(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	idStr := c.Query("id")
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		model.DeleteTouban(id)
+		print("Invalid ID")
 	}
+	model.DeleteOrder(id)
 }

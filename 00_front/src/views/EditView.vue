@@ -13,19 +13,20 @@
 import Setting from '@/components/Setting'
 
 export default {
-  name: 'CreateView',
+  name: 'EditView',
   components: { 
     Setting,
   },
   data(){
     return {
-      current_toubanInfo:[],
+      current_toubanInfo:{},
       current_memberInfo:[],
     }
   },
   methods:{
     Update(){
       var currentTab = this.$refs.RefSetting.tab
+
       // 更新前チェックとデータの取得
       var result = this.$refs.RefSetting.Validation()
       if(result.status == "OK"){
@@ -35,10 +36,13 @@ export default {
       }
 
       // データベース更新
-      switch(tab){
+      switch(currentTab){
         // 当番名
         case "option-1":
-          this.axios.post("/touban", data)
+          // データ更新
+          this.current_toubanInfo.title = result.data
+          // update request
+          this.axios.put("/touban", this.current_toubanInfo)
           .then(response => {
             console.log(response)
           }).catch(error => console.log(error))
@@ -64,13 +68,12 @@ export default {
       }
     }
   },
-  // mounted(){
-  //   var urlPathId = this.$route.params.id
-  //   this.axios.get("/order", {params:{id: urlPathId}})
-  //     .then(response => {
-  //       this.member = response.data
-  //     })
-  //     // .catch(error => console.log(error))
-  // }
+  mounted(){
+    var urlPathId = this.$route.params.id
+    var toubanInfo = {}
+    // オーナーの取得
+    toubanInfo = this.$store.getters.GetToubanByID(urlPathId)
+    this.current_toubanInfo = toubanInfo[0]  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
+  }
 }
 </script>
