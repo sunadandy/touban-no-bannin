@@ -42,7 +42,7 @@ CREATE TABLE `toubanTbl` (
 
 LOCK TABLES `toubanTbl` WRITE;
 /*!40000 ALTER TABLE `toubanTbl` DISABLE KEYS */;
-INSERT INTO `toubanTbl` VALUES (1,'sample2','','2023-01-01',0,0,0,'',''),(2,'sample3','','2023-01-01',0,0,0,'',''),(5,'sample4','yamada','2023-04-01',0,0,0,'','');
+INSERT INTO `toubanTbl` VALUES (1,'テスト','yamada','2023-01-01',0,0,0,'','');
 /*!40000 ALTER TABLE `toubanTbl` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -55,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-04-23 13:57:34
+-- Dump completed on 2023-04-24  9:57:34
