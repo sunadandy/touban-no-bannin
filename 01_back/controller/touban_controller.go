@@ -26,15 +26,15 @@ func PostTouban(c *gin.Context) {
 	err = c.ShouldBindJSON(&stTouban)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	} else {
+		// データベースに追加
+		err = AddTouban(stTouban)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"data": "Success!"})
+		}
 	}
-	// データベースに追加
-	err = AddTouban(stTouban)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"data": "Success!"})
 }
 func AddTouban(accessT AccessTouban) error {
 	return accessT.CreateTouban()
@@ -47,14 +47,15 @@ func PutTouban(c *gin.Context) {
 	err := c.ShouldBindJSON(&stTouban)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	} else {
+		// レコード更新
+		changedColumns := UpdateTouban(stTouban)
+		if changedColumns != 0 {
+			c.JSON(http.StatusOK, gin.H{"data": "Success!"})
+		}
+		// c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	// レコード更新
-	changedColumns := UpdateTouban(stTouban)
-	if changedColumns != 0 {
-		c.JSON(http.StatusOK, gin.H{"data": "Success!"})
-	}
-	// c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 }
 func UpdateTouban(accessT AccessTouban) int64 {
 	return accessT.UpdateTouban()
@@ -65,6 +66,7 @@ func DeleteTouban(c *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		print("Invalid ID")
+	} else {
+		model.DeleteTouban(id)
 	}
-	model.DeleteTouban(id)
 }

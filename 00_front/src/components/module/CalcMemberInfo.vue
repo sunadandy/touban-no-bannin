@@ -8,31 +8,24 @@ import { addDays, format, parseISO, startOfToday } from 'date-fns'
 
 export default {
   name: 'CalcMemberInfo',
-  data(){
-    return{
-      toubanInfo: [],
-      interval_type: 2  //デフォルト値
-    }
-  },
   methods:{
-    GetNewMemberInfo(toubanId, selected){
+    CalcuNewMemberInfo(toubanId, interval_type, selected){
       var new_memberInfos = []
 
       // 当番IDに一致する順番レコードを取得
-      var current_memberInfos = []
-      current_memberInfos = this.$store.getters.GetMemberByToubanId(toubanId)
+      const current_memberInfos = this.$store.getters.GetMemberByToubanId(toubanId)
       // CreateかUpdateかを取得したレコードの長さで判定
       if(current_memberInfos.length == 0){
         var currentMaxOrder = 0
         var currentMaxNextDate = format(startOfToday(), 'yyyy-MM-dd')
         for(var i=0; i<selected.length; i++){
           var memberInfo = {}
-          memberInfo.touban_id = toubanId
+          memberInfo.touban_id = parseInt(toubanId)
           memberInfo.name = selected[i].name
           memberInfo.emplyoee_number = "E" + selected[i].emplyoeeNo   //バックエンド側で数値文字列を上手く扱えないのでE付きに。
           memberInfo.order_number = currentMaxOrder + 1
           memberInfo.last = "2100-1-1"  //適当な初期値
-          memberInfo.next = this.CalcNextDate(currentMaxNextDate)
+          memberInfo.next = this.CalcNextDate(currentMaxNextDate, parseInt(interval_type))
           memberInfo.email = selected[i].email
           new_memberInfos.push(memberInfo)
 
@@ -41,7 +34,7 @@ export default {
         }
       }else{
         // 現在のorderの最大値を取得
-        var currentMaxOrder = current_memberInfos.reduce((prev, current) => (prev.order > current.order) ? prev.order : current.order);
+        var currentMaxOrder = current_memberInfos.reduce((prev, current) => (prev.order_number > current.order_number) ? prev : current).order_number;
         // 現在の次回実施日の最大値を取得
         var maxEpochTime = Math.max(...current_memberInfos.map(x => new Date(x.next).getTime()));
         var currentMaxNextDate = format(maxEpochTime, 'yyyy-MM-dd')
@@ -57,26 +50,31 @@ export default {
             // 最後まで一致する名前が見つからなかった場合は新規メンバー
             if(i == current_memberInfos.length-1){
               var memberInfo = {}
-              memberInfo.touban_id = this.toubanId
+              memberInfo.touban_id = parseInt(toubanId)
               memberInfo.name = selected[j].name
               memberInfo.emplyoee_number = "E" + selected[j].emplyoeeNo   //バックエンド側で数値文字列を上手く扱えないのでE付きに。
               memberInfo.order_number = currentMaxOrder + 1
               memberInfo.last = "2100-1-1"  //適当な初期値
-              memberInfo.next = this.CalcNextDate(currentMaxNextDate)
+              memberInfo.next = this.CalcNextDate(currentMaxNextDate, parseInt(interval_type))
               memberInfo.mail = selected[j].email
               new_memberInfos.push(memberInfo)
   
-              currentMaxOrder = memberInfo.order
+              currentMaxOrder = memberInfo.order_number
               currentMaxNextDate = memberInfo.next
             }
           }
         }
+        // order_numberでソートして採番
+        new_memberInfos.sort((a, b) => a.order_number - b.order_number);
+        for (var i = 0; i < new_memberInfos.length; i++) {
+          new_memberInfos[i].order_number = i + 1;
+        }
       }
       return new_memberInfos
     },
-    CalcNextDate(currentMaxNextDate){
+    CalcNextDate(currentMaxNextDate, interval_type){
       const date = parseISO(currentMaxNextDate)
-      switch(this.interval_type){
+      switch(interval_type){
         // 毎日
         case 1:
           var nextDate = format(addDays(date, 1), 'yyyy-MM-dd')
@@ -99,14 +97,5 @@ export default {
       }
     },
   },
-  created(){
-    const toubanId = this.$route.params.id
-    // Editモードの場合はURLからID取得
-    if(toubanId != undefined){
-      // toubanIDに一致するレコード取得
-      this.toubanInfo = this.$store.getters.GetToubanByID(toubanId)
-      this.interval_type = int(this.toubanInfo[0].interval_type)
-    }
-  }
 }
 </script>

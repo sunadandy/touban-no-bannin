@@ -26,18 +26,18 @@ func PostMember(c *gin.Context) {
 	err = c.ShouldBindJSON(&stMembers)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// データベースに追加
-	for _, jsonData := range stMembers {
-		err = AddMember(jsonData)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": `${jsonData}が正しく書き込めなかったレコードがあります。`})
-			return
+	} else {
+		// データベースに追加
+		for _, jsonData := range stMembers {
+			err = AddMember(jsonData)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": `${jsonData}が正しく書き込めなかったレコードがあります。`})
+			} else {
+				c.JSON(http.StatusOK, gin.H{"data": "Success!"})
+			}
 		}
 	}
-	c.JSON(http.StatusOK, gin.H{"data": "Success!"})
+
 }
 func AddMember(accessO AccessMember) error {
 	return accessO.CreateMember()
@@ -52,6 +52,7 @@ func DeleteMember(c *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		print("Invalid ID")
+	} else {
+		model.DeleteMember(id)
 	}
-	model.DeleteMember(id)
 }

@@ -22,8 +22,9 @@ export default {
   },
   data(){
     return {
-      // current_toubanInfo:{},
-      // current_memberInfo:[],
+      toubanId: -1,
+      current_toubanInfo: {},
+      currentOwner: "",
     }
   },
   methods:{
@@ -31,31 +32,41 @@ export default {
       // 子(Setting)に入力項目のチェックを要求
       var result = this.$refs.RefSetting.Validation()
       if(!result.status){
-        alert("${currentTab}の設定が正しくありません")
+        alert(`${result.tab}の設定が正しくありません`)
         return
+      }
+
+      // selectedにオーナーが含まれていない場合はNG
+      if(result.tab == "option-2"){
+        const foundOwner = result.data.some((item) => {
+          return item.name.includes(this.currentOwner)
+        })
+        if(!foundOwner){
+          alert("オーナーが選択されていません")
+        }
       }
       
       // データベース更新(アクティブタブ単位でデータを取得)
       switch(result.tab){
         // 当番名
         case "option-1":
-          var current_toubanInfo = {}
-          current_toubanInfo.title = result.data
-          this.axios.put("/touban", this.current_toubanInfo)
+          var updateToubanInfo = this.current_toubanInfo
+          updateToubanInfo.title = result.data
+          this.axios.put("/touban", updateToubanInfo)
           .then(response => {
             console.log(response)
           }).catch(error => console.log(error))
           break
         // メンバー編集
         case "option-2":
-          const toubanId = this.$route.params.id
-          var selected = result.data
-          var new_memberInfos = this.$refs.RefCaclcMemberInfo.GetNewMemberInfo(toubanId, selected)
+          const selected = result.data
+          const interval_type = this.current_toubanInfo.interval_type
+          const updateMemberInfos = this.$refs.RefCaclcMemberInfo.CalcuNewMemberInfo(this.toubanId, interval_type, selected)
           // 古いメンバー情報を削除
-          this.axios.delete("/member", {params:{id: toubanId}})
+          this.axios.delete("/member", {params:{id: this.toubanId}})
           .then(response => {
             // 新しいメンバー情報を登録
-            this.axios.post("/member", {new_memberInfos})
+            this.axios.post("/member", updateMemberInfos)
           }).catch(error => console.log(error))
           break
         // スケジュール設定
@@ -77,9 +88,10 @@ export default {
     },
   },
   mounted(){
-    const toubanId = this.$route.params.id
-    const toubanInfo = this.$store.getters.GetToubanByID(toubanId)
+    this.toubanId = this.$route.params.id
+    const toubanInfo = this.$store.getters.GetToubanByID(this.toubanId)
     this.current_toubanInfo = toubanInfo[0]  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
+    this.currentOwner = this.current_toubanInfo.owner
   }
 }
 </script>

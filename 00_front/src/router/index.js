@@ -15,11 +15,6 @@ const routes = [
     path: '/home',
     name: 'home',
     component: HomeView,
-    // websocket代替処理
-    beforeRouteEnter(to, from, next) {
-      location.reload()
-      next()
-    }
   },
   {
     path: '/create',

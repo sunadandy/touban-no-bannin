@@ -51,6 +51,10 @@ export default {
       owner: ""
     }
   },
+  create(){
+    // websocket代替
+    location.reload()
+  },
   mounted(){
     const toubanId = this.$route.params.id
     // オーナーの把握

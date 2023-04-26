@@ -128,5 +128,5 @@ func (stMember StMember) UpdateMember() error {
 }
 
 func DeleteMember(toubanId int) {
-	db.Table(toubanTbl).Where("touban_id = ?", toubanId).Delete(&StMember{})
+	db.Table(memberTbl).Where("touban_id = ?", toubanId).Delete(&StMember{})
 }

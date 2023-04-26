@@ -42,6 +42,10 @@
 <script>
 export default {
   name: 'HomeView',
+  create(){
+    // websocket代替
+    location.reload()
+  },
   methods: {
     Show: function(id) {
       this.$router.push({name: "show", params: {id: id}})

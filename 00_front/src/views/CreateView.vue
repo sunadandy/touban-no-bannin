@@ -60,7 +60,7 @@ export default {
       newTouban.message = result.data[3].data
       newTouban.password = password
       newTouban.cc = result.data[4].data.cc
-      newMember = this.$refs.RefCaclcMemberInfo.GetNewMemberInfo(nextToubanId, result.data[1].data)
+      newMember = this.$refs.RefCaclcMemberInfo.CalcuNewMemberInfo(nextToubanId, newTouban.interval_type, result.data[1].data)
 
       // 当番テーブルに新規追加
       this.axios.post("/touban", newTouban)
