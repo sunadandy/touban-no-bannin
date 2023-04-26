@@ -14,33 +14,35 @@ type StTouban struct {
 	Owner         string `json:"owner"`
 	Start         string `json:"start"`
 	Interval_type int    `json:"interval_type"`
-	Mail          bool   `json:"mail"`
-	Remind        int    `json:"remind_type"`
+	Mailing       bool   `json:"mailing"`
+	Timing        int    `json:"timing"`
 	Message       string `json:"message"`
 	Password      string `json:"password"`
+	Cc            string `json:"cc"`
 }
 
 // 順番テーブル(JSON)をマッピングする構造体
-type StOrder struct {
-	Touban_id       int    `json:"toubanId"`
+type StMember struct {
+	Touban_id       int    `json:"touban_id"`
 	Name            string `json:"name"`
-	Employee_number string `json:"employeeNo"`
-	Order_number    int    `json:"order"`
+	Employee_number string `json:"emplyoee_number"`
+	Email           string `json:"email"`
+	Order_number    int    `json:"order_number"`
 	Last            string `json:"last"`
 	Next            string `json:"next"`
 }
-type Orders []StOrder
+type Members []StMember
 
 var db *gorm.DB
 var toubanTbl string = "toubanTbl"
-var orderTbl string = "orderTbl"
+var memberTbl string = "memberTbl"
 
 func DBConnect() {
 	DBMS := "mysql"
 	USER := "root"
 	PASS := "root"
 	// PROTOCOL := "tcp(touban_cont:3306)"
-	PROTOCOL := "tcp(172.19.0.2:3306)" //コンテナのIP
+	PROTOCOL := "tcp(172.19.0.2:3306)" //MySQLコンテナのIP
 	DB := "toubanDB"
 
 	connection := USER + ":" + PASS + "@" + PROTOCOL + "/" + DB
@@ -57,14 +59,14 @@ func NewTouban() StTouban {
 	return stTouban
 }
 
-func NewOrder() StOrder {
-	stOrder := StOrder{}
-	return stOrder
+func NewMember() StMember {
+	stMember := StMember{}
+	return stMember
 }
 
-func NewOrders() Orders {
-	orders := Orders{}
-	return orders
+func NewMembers() Members {
+	members := Members{}
+	return members
 }
 
 // ---------------------------------------------------------------
@@ -73,7 +75,6 @@ func NewOrders() Orders {
 func (stTouban StTouban) CreateTouban() error {
 	err := db.Table(toubanTbl).Create(&stTouban).Error
 	if err != nil {
-		print(err)
 		return err
 	}
 	return nil
@@ -104,39 +105,28 @@ func DeleteTouban(id int) {
 // ---------------------------------------------------------------
 // 順番テーブルCRUD
 // ---------------------------------------------------------------
-func (stOrder StOrder) CreateOrder() error {
-	err := db.Table(orderTbl).Create(&stOrder).Error
+func (stMember StMember) CreateMember() error {
+	err := db.Table(memberTbl).Create(&stMember).Error
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func ReadOrder() string {
-	stOrder := []StOrder{}
-	db.Table(orderTbl).Find(&stOrder)
-	jsonData, err := json.Marshal(&stOrder)
+func ReadMember() string {
+	stMember := []StMember{}
+	db.Table(memberTbl).Find(&stMember)
+	jsonData, err := json.Marshal(&stMember)
 	if err != nil {
 		print(err)
 	}
 	return string(jsonData)
 }
 
-func (stOrder StOrder) UpdateOrder() error {
+func (stMember StMember) UpdateMember() error {
 	return nil
 }
 
-func DeleteOrder(refId int) {
-	db.Table(toubanTbl).Where("toubanId = ?", refId).Delete(&StOrder{})
+func DeleteMember(toubanId int) {
+	db.Table(toubanTbl).Where("touban_id = ?", toubanId).Delete(&StMember{})
 }
-
-// func ReadOrderByToubanID(id string) string {
-// 	stOrder := []StOrder{}
-// 	// テーブルIDでフィルタリングして取得
-// 	db.Table(orderTbl).Where("touban_id = ?", id).Find(&stOrder)
-// 	jsonData, err := json.Marshal(&stOrder)
-// 	if err != nil {
-// 		print(err)
-// 	}
-// 	return string(jsonData)
-// }

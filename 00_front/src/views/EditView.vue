@@ -1,5 +1,6 @@
 <template>
   <div>
+    <calc-member-info ref="RefCaclcMemberInfo"/>
     <setting
       v-bind:current_toubanInfo="current_toubanInfo"
       v-bind:current_memberInfo="current_memberInfo"
@@ -11,37 +12,35 @@
 
 <script>
 import Setting from '@/components/Setting'
+import CalcMemberInfo from '@/components/module/CalcMemberInfo'
 
 export default {
   name: 'EditView',
   components: { 
     Setting,
+    CalcMemberInfo,
   },
   data(){
     return {
-      current_toubanInfo:{},
-      current_memberInfo:[],
+      // current_toubanInfo:{},
+      // current_memberInfo:[],
     }
   },
   methods:{
     Update(){
-      var currentTab = this.$refs.RefSetting.tab
-
-      // 更新前チェックとデータの取得
+      // 子(Setting)に入力項目のチェックを要求
       var result = this.$refs.RefSetting.Validation()
-      if(result.status == "OK"){
-        result.data
-      }else{
+      if(!result.status){
         alert("${currentTab}の設定が正しくありません")
+        return
       }
-
-      // データベース更新
-      switch(currentTab){
+      
+      // データベース更新(アクティブタブ単位でデータを取得)
+      switch(result.tab){
         // 当番名
         case "option-1":
-          // データ更新
-          this.current_toubanInfo.title = result.data
-          // update request
+          var current_toubanInfo = {}
+          current_toubanInfo.title = result.data
           this.axios.put("/touban", this.current_toubanInfo)
           .then(response => {
             console.log(response)
@@ -49,6 +48,15 @@ export default {
           break
         // メンバー編集
         case "option-2":
+          const toubanId = this.$route.params.id
+          var selected = result.data
+          var new_memberInfos = this.$refs.RefCaclcMemberInfo.GetNewMemberInfo(toubanId, selected)
+          // 古いメンバー情報を削除
+          this.axios.delete("/member", {params:{id: toubanId}})
+          .then(response => {
+            // 新しいメンバー情報を登録
+            this.axios.post("/member", {new_memberInfos})
+          }).catch(error => console.log(error))
           break
         // スケジュール設定
         case "option-3":
@@ -66,13 +74,11 @@ export default {
         case "option-7":
           break
       }
-    }
+    },
   },
   mounted(){
-    var urlPathId = this.$route.params.id
-    var toubanInfo = {}
-    // オーナーの取得
-    toubanInfo = this.$store.getters.GetToubanByID(urlPathId)
+    const toubanId = this.$route.params.id
+    const toubanInfo = this.$store.getters.GetToubanByID(toubanId)
     this.current_toubanInfo = toubanInfo[0]  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
   }
 }

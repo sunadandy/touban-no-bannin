@@ -52,13 +52,16 @@ export default {
     Delete: function(id) {
       // 当番テーブルから該当するキーのレコードを削除
       this.axios.delete("/touban", {params: {id: id}})
+      .then(
+        this.$router.push("/home")
+      )
       // 順番テーブルから当番IDが一致するレコードを削除
-      this.axios.delete("/order", {params: {id: id}})
+      this.axios.delete("/member", {params: {id: id}})
     },
     Create: function() {
       this.$router.push("/create")
     },
-  }
+  },
 }
 </script>
 

@@ -23,23 +23,24 @@ export default {
   },
   data(){
     return{
-      selectable: [],
+      selectable: [], //{"employeeNo", "name", "email"}のJSON配列
     }
   },
   methods:{
-    // selectableと選択されたアイテム(name)を比較して一致する要素を返す
+    // selectableはJSONだが、selectedはnameのみ
     GetSelected(){
       const selected = document.getElementById("m-selected")
-      var array = []
+      var jsonArray = []
       for ( var i=0,l=selected.length; l>i; i++ ) {
         for(var j=0; j < this.selectable.length; j++){
+          // 必ずどこかで一致する
           if(selected[i].value == this.selectable[j].name){
-            array.push(this.selectable[j])
+            jsonArray.push(this.selectable[j])
             break
           }
         }
       }
-      return array
+      return jsonArray
     },
   },
   mounted(){

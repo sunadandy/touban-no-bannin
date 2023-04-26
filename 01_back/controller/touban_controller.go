@@ -26,17 +26,18 @@ func PostTouban(c *gin.Context) {
 	err = c.ShouldBindJSON(&stTouban)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	// データベースに追加
 	err = AddTouban(stTouban)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": "Success!"})
 }
 func AddTouban(accessT AccessTouban) error {
-	err := accessT.CreateTouban()
-	return err
+	return accessT.CreateTouban()
 }
 
 func PutTouban(c *gin.Context) {
@@ -56,8 +57,7 @@ func PutTouban(c *gin.Context) {
 	// c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 }
 func UpdateTouban(accessT AccessTouban) int64 {
-	ret := accessT.UpdateTouban()
-	return ret
+	return accessT.UpdateTouban()
 }
 
 func DeleteTouban(c *gin.Context) {
@@ -66,5 +66,5 @@ func DeleteTouban(c *gin.Context) {
 	if err != nil {
 		print("Invalid ID")
 	}
-	model.DeleteOrder(id)
+	model.DeleteTouban(id)
 }

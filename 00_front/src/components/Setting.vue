@@ -129,11 +129,9 @@ export default {
     return {
       // [Issue]本当はoption-1にしたいが、1にするとmultiselectがレンダリングされない
       tab: 'option-2',
-      toubanInfo: ["id", "title", "owner", "start", "interval_type", "mail", "remind_type", "message", "password"],
+      toubanInfo: ["id", "title", "owner", "start", "interval_type", "mail", "timing", "message", "password"],
       member: [],   //memberInfoを格納する配列
-      memberInfo: ["toubanID", "name", "employeeNo", "order", "last", "next"],
       hint: "当番名を設定してください",
-      result: ["data", "status"]
     }
   },
   props:{
@@ -148,52 +146,100 @@ export default {
     PageBack(){
       this.$router.push("/home")
     },
+    GetSelected(){
+      return this.$refs.RefMemberSelect.GetSelected()
+    },
     Validation(){
       if(this.limited == true){
-        ValidationAll()
+        const result = this.ValidationAll()
+        return result
       }else{
-        this.ValidationIndividual(this.tab)
+        const result = this.ValidationIndividual(this.tab)
+        return result
       }
-      return this.result
     },
     ValidationAll(){
-      this.ValidationIndividual("option-1")
-      this.ValidationIndividual("option-2")
-      this.ValidationIndividual("option-3")
-      this.ValidationIndividual("option-4")
-      this.ValidationIndividual("option-7")
+      const validations  = [
+        this.ValidationIndividual("option-1"),
+        this.ValidationIndividual("option-2"),
+        this.ValidationIndividual("option-3"),
+        this.ValidationIndividual("option-4"),
+        this.ValidationIndividual("option-7"),
+      ]
+      const isValid = validations.every(validation => validation.status);   // validation.statusが全てtrueならtrueを返す
+      const dataArray = validations.map(validation => {
+        return {
+          data: validation.data
+        }
+      })
+      const result = {status: isValid, data: dataArray}
+      
+      return result
     },
     ValidationIndividual(tab){
+      var data
+      var status
       switch(tab){
         // 当番名
         case "option-1":
-          var data = ""
-          data = this.$refs.RefInputField.inputData
-          this.result.data = data
-          this.result.status = "OK"
+          try{
+            data = this.$refs.RefInputField.inputData
+            status = true
+          }catch{
+            // 子コンポーネントがインスタンス化されていない状態でdataプロパティにアクセスした場合に例外発生
+            data = null
+            status = false
+          }
           break
         // メンバー編集
         case "option-2":
-          var data = {}
-          // memberプロパティに選択要素を格納
-          data = this.$refs.RefMemberSelect.GetSelected()
-          this.result.data = data
-          this.result.status = "OK"
+          try{
+            data = this.GetSelected()
+            if(data.length == 0){
+              status = false
+            }else{
+              status = true
+            }
+          }catch{
+            // 子コンポーネントがインスタンス化されていない状態でdataプロパティにアクセスした場合に例外発生
+            data = null
+            status = false
+          }
           break
         // スケジュール設定
         case "option-3":
-          var interval = this.$refs.RefSchedule.interval
-          var startDate = this.$refs.RefSchedule.date
-          this.toubanInfo.interval_type = interval
-          this.toubanInfo.start = startDate
+          try{
+            const interval = this.$refs.RefSchedule.interval
+            const startDate = this.$refs.RefSchedule.date
+            data = {interval, startDate}  //連想配列の時点でintから勝手にStringになるっぽい
+            status = true
+          }catch{
+            // 子コンポーネントがインスタンス化されていない状態でdataプロパティにアクセスした場合に例外発生
+            data = null
+            status = false
+          }
           break
         // メッセージ設定
         case "option-4":
-          this.toubanInfo.message = this.$refs.RefInputArea.inputData
+          try{
+            data = this.$refs.RefInputArea.inputData
+            status = true
+          }catch{
+            // 子コンポーネントがインスタンス化されていない状態でdataプロパティにアクセスした場合に例外発生
+            data = null
+            status = false
+          }
           break
           // 順番変更
         case "option-5":
-          this.memberInfo = this.$refs.RefDragDropSwap.dataList.concat()
+          try{
+            data = this.$refs.RefDragDropSwap.dataList.concat()
+            status = true
+          }catch{
+            // 子コンポーネントがインスタンス化されていない状態でdataプロパティにアクセスした場合に例外発生
+            data = null
+            status = false
+          }
           break
         // オーナー変更
         case "option-6":
@@ -209,12 +255,30 @@ export default {
           break
         // メール配信設定
         case "option-7":
-          var data = this.$refs.RefMail.GetMailSetting()
-          this.toubanInfo.mail = data
+          try{
+            data = this.$refs.RefMail.GetMailSetting()
+            status = true
+          }catch{
+            // 子コンポーネントがインスタンス化されていない状態でdataプロパティにアクセスした場合に例外発生
+            data = null
+            status = false
+          }
           break
+      }
+
+      return {
+        tab: tab,
+        data: data,
+        status: status, //現状、true固定。falseが返るケースが発生した際は修正
       }
     }
   },
+  mounted(){
+    if(this.limited){
+      const toubanId = this.$route.params.id
+      this.member = this.$store.getters.GetMemberByToubanId(toubanId)
+    }
+  }
 }
 </script>
 

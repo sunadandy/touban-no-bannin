@@ -16,7 +16,7 @@
         persistent-hint
         :items=[1,2,3,4,5,6,7]
         variant="outlined"
-        v-model='remindDate'
+        v-model='timing'
       ></v-select>
       <input-text-field v-bind:hint='hint' ref="RefInputField" v-if="model == true"/>
     </div>
@@ -32,19 +32,27 @@ export default {
     InputTextField
   },
   data(){
-    return{
+    return {
       model: true,
-      hint: "CC設定(複数の場合はコロン区切り)",
-      remindDate: 1
+      hint: "CC設定(複数の場合はコロン区切り)。オーナーな自動でCCに追加されます",
+      timing: 1,
     }
   },
   methods:{
     GetMailSetting(){
       if(this.model === false){
-        return [this.model, null, null]
+        return {
+          mailing: this.model,
+          timing: 1,  //デフォルト値
+          cc: "",     //デフォルト値。string型なのでnullはNG
+        }
       }else{
         var cc = this.$refs.RefInputField.inputData
-        return [this.model, this.remindDate, cc]
+        return {
+          mailing: this.model,
+          timing: this.timing,
+          cc: cc,
+        }
       }
     }
   }

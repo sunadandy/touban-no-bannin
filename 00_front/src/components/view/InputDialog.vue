@@ -1,7 +1,5 @@
 <template>
   <div>
-    <person-manager ref="RefPersonManager"></person-manager>
-
     <v-dialog
       v-model=this.dialog
       persistent
@@ -50,21 +48,26 @@
 
 <script>
 import InputTextField from '@/components/design/InputTextField'
-import PersonManager from '@/components/model/PersonManager'
 
 export default {
   name: 'InputDialog',
   components: { 
     InputTextField,
-    PersonManager,
   },
   data(){
     return {
       dialog: false,
-      password: null,
-      ownerNumber: null,
-      hint1: "当番のオーナーの社員番号(6ケタ)を入力してください",
+      password: "",
+      ownerNumber: "",
+      hint1: "当番のオーナーの社員番号を入力してください",
       hint2: "パスワードを設定してください",
+    }
+  },
+  props:{
+    selected:{
+      type: Array,
+      required: true,
+      default: () => [],
     }
   },
   methods: {
@@ -72,23 +75,24 @@ export default {
       this.dialog = true
     },
     Validation(){
+      const ownerNumber = this.$refs.RefInputField1.inputData
+      const password = this.$refs.RefInputField2.inputData
+      var owner = new String()
+      
       // 入力された社員番号がアドレス帳に登録されている番号かどうかチェック
-      var userData = this.$refs.RefPersonManager.userData
-      var ownerNumber = this.$refs.RefInputField1.inputData
-      var password = this.$refs.RefInputField2.inputData
-      for(var i=0; i<userData.length; i++){
-        if(userData[i].emplyoeeNo == ownerNumber){
-          // オーナーとパスワードの格納
+      for(var i=0; i<this.selected.length; i++){
+        if(this.selected[i].emplyoeeNo == ownerNumber){
+          owner = this.selected[i].name
           this.ownerNumber = ownerNumber
           this.password = password
           this.dialog = false
-
-          return true
+          
+          this.$emit('CloseDialog', {password: this.password, owner: owner})
+          return true //照合が成功したら処理を抜けたいのでtrueに意味はないがreturn
         }
       }
-      alert("データベースに存在しない社員番号です。")
+      alert("オーナーが選択メンバーに含まれていません。")
       this.dialog = true
-      return false
     }
   }
 }

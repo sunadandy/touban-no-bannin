@@ -18,22 +18,23 @@
               メンバー
             </th>
             <th class="text-center">
-              最終実施日
+              次回実施日
             </th>
             <th class="text-center">
-              次回実施日
+              最終実施日
             </th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="m in member" :key="m.order"
+            class="text-center"
+            v-for="m in member" :key="m.order_number"
             v-bind:class="m.name == owner ? 'coloring' : ''"
           >
-            <td>{{ m.order }}</td>
+            <td>{{ m.order_number }}</td>
             <td>{{ m.name }}</td>
-            <td>{{ m.last }}</td>
             <td>{{ m.next }}</td>
+            <td>{{ m.last }}</td>
           </tr>
         </tbody>
       </v-table>
@@ -51,13 +52,12 @@ export default {
     }
   },
   mounted(){
-    var urlPathId = this.$route.params.id
-    var toubanInfo = {}
-    // オーナーの取得
-    toubanInfo = this.$store.getters.GetToubanByID(urlPathId)
+    const toubanId = this.$route.params.id
+    // オーナーの把握
+    const toubanInfo = this.$store.getters.GetToubanByID(toubanId)
     this.owner = toubanInfo[0].owner  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
     // メンバーの取得
-    this.member = this.$store.getters.GetOrderByID(urlPathId)
+    this.member = this.$store.getters.GetMemberByToubanId(toubanId)
   }
 }
 </script>

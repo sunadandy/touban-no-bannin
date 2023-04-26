@@ -5,10 +5,10 @@
       <p>※不定期を設定した場合、メール配信は開始日に対する一度のみです。</p>
     </div>
     <v-radio-group v-model="interval" inline>
-      <v-radio label="毎日" value="1"></v-radio>
-      <v-radio label="毎週" value="2"></v-radio>
-      <v-radio label="毎月" value="3"></v-radio>
-      <v-radio label="不定期" value="4"></v-radio>
+      <v-radio label="毎日" value=1></v-radio>
+      <v-radio label="毎週" value=2></v-radio>
+      <v-radio label="毎月" value=3></v-radio>
+      <v-radio label="不定期" value=4></v-radio>
     </v-radio-group>
     <!-- 
       format:画面に表示する日時の表示形式
@@ -43,8 +43,8 @@ export default {
     var day = _today.getDate()
     var today = year + "-" + month + "-" + day
     return {
-      interval: 2,
-      date: today,
+      interval: 2,  //デフォルト値
+      date: today,  //デフォルト値
       format: function(date){
         const day = date.getDate();
         const month = date.getMonth() + 1;

@@ -8,11 +8,13 @@ export default createStore({
   },
   getters: {
     GetToubanByID: (state) => (id) => {
+      // 条件が一致しなかった場合、空配列がリターンされる
       return state.currenToubanTable.filter(item => item.id == id)
     },
-    GetOrderByID: (state) => (id) => {
-      return state.currentOrderTable.filter(item => item.toubanId == id)
-    }
+    GetMemberByToubanId: (state) => (id) => {
+      // 条件が一致しなかった場合、空配列がリターンされる
+      return state.currentOrderTable.filter(item => item.touban_id == id)
+    },
   },
   mutations: {
     setCurrenToubanTable(state, data){
@@ -31,7 +33,7 @@ export default createStore({
       // .catch(error => console.log(error))
 
       // [MEMO]必要以上にデータをフェッチしているので遅延に注意
-      axios.get("/order")
+      axios.get("/member")
       .then(response => {
         context.commit('setCurrentOrderTable', response.data)
       })
