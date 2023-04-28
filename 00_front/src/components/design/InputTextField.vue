@@ -18,13 +18,19 @@ export default {
   name: "InputTextField",
   data(){
     return{
-      inputData: "",
+      inputData: this.initText,
     }
   },
   props:{
     hint:{
       type: String,
-      require: true
+      require: true,
+      defalt: () => ""
+    },
+    initText:{
+      type: String,
+      require: true,
+      defalt: () => ""
     }
   },
 }

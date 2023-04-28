@@ -49,6 +49,9 @@ export default {
         return (prev.id > current.id) ? prev.id : current.id
       }, 0);
       const nextToubanId = maxToubanId + 1
+      // オーナーのメールアドレス取得
+      const ownerData = result.data[1].data.find(data => data.name == owner);
+      const email = ownerData ? ownerData.email : "";
 
       newTouban.id = nextToubanId
       newTouban.title = result.data[0].data
@@ -59,7 +62,7 @@ export default {
       newTouban.timing = result.data[4].data.timing
       newTouban.message = result.data[3].data
       newTouban.password = password
-      newTouban.cc = result.data[4].data.cc
+      newTouban.cc = email + ";" + result.data[4].data.cc   //オーナーはCCに自動追加
       newMember = this.$refs.RefCaclcMemberInfo.CalcuNewMemberInfo(nextToubanId, newTouban.interval_type, result.data[1].data)
 
       // 当番テーブルに新規追加

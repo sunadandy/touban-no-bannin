@@ -1,13 +1,12 @@
 <template>
   <div class="vtab-setting">
     <v-select
-      v-model='data.nextOwner'
-      :items="memberList.name"
+      v-model="owner"
+      :items="nameList"
       hint="オーナー変更先を選んでください"
       persistent-hint
       variant="outlined"
     ></v-select>
-    <!-- <input-text-field v-bind:hint='hint' @CbkChangeText="CbkChangeText"/> -->
     <input-text-field v-bind:hint='hint' ref="RefTextField"/>
   </div>
 </template>
@@ -22,8 +21,8 @@ export default {
   },
   data(){
     return{
-      NameOnlyList: [],
-      data: {newPassword: null, nextOwner: null},
+      owner: null,
+      nameList: this.memberList.map(member => member.name),
       hint: "新しいパスワードを設定してください。",
     }
   },
@@ -36,8 +35,16 @@ export default {
   },
   methods:{
     GetData(){
-      this.data.newPassword = this.$refs.RefTextField.inputData
-      return this.data
+      const password = this.$refs.RefTextField.inputData
+      var email = ""
+      if(this.owner != null){
+        email = this.memberList.find(member => member.name == this.owner).email
+      }
+      return {
+        owner: this.owner,
+        password: password,
+        email: email,
+      }
     }
   }
 }

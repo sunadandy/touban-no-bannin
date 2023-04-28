@@ -90,12 +90,12 @@
           </v-window-item>
           <v-window-item value="option-6">
             <v-card flat>
-              <owner-setting v-bind:memberList="member" ref="RefOwner"></owner-setting>
+              <owner-setting v-bind:memberList="memberInfo" ref="RefOwner"></owner-setting>
             </v-card>
           </v-window-item>
           <v-window-item value="option-7">
             <v-card flat>
-              <mail-setting ref="RefMail"/>
+              <mail-setting ref="RefMail" v-bind:currentCc="currentCc"/>
             </v-card>
           </v-window-item>
         </v-window>
@@ -132,6 +132,7 @@ export default {
       hint: "当番名を設定してください",
       memberInfo: [],   //{"employeeNo", "name", "email"}のJSON配列
       currentMessage: "",
+      currentCc: "",
     }
   },
   props:{
@@ -243,13 +244,12 @@ export default {
           break
         // オーナー変更
         case "option-6":
-          var data = this.$refs.RefOwner.GetData()
-          var nextOwner = data.nextOwner
-          var deleteKey = data.newKey
-          if(nextOwner != null && deleteKey != null){
-            this.toubanInfo.owner = nextOwner
-            this.toubanInfo.deleteKey = deleteKey
+          data = this.$refs.RefOwner.GetData()
+          if(data.owner != null && data.password != undefined){
+            status = true  
           }else{
+            data = null
+            status = false
             alert("変更先オーナーもしくはパスワードの未設定です。")
           }
           break
@@ -286,6 +286,7 @@ export default {
         email: info.email,
       }))
       this.currentMessage = currentToubanInfo[0].message
+      this.currentCc = currentToubanInfo[0].cc
     }
   },
 }

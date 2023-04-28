@@ -42,8 +42,9 @@ export default {
     Update(){
       // 子(Setting)に入力項目のチェックを要求
       var result = this.$refs.RefSetting.Validation()
+      // status=falseなら終了
       if(!result.status){
-        alert(`${result.tab}の設定が正しくありません`)
+        // alert(`${result.tab}の設定が正しくありません`)
         return
       }
 
@@ -97,6 +98,14 @@ export default {
           break
         // オーナー変更
         case "option-6":
+          var updateToubanInfo = this.current_toubanInfo
+          updateToubanInfo.owner = result.data.owner
+          updateToubanInfo.password = result.data.password
+          updateToubanInfo.cc = updateToubanInfo.cc + ";" + result.data.email
+          this.axios.put("/touban", updateToubanInfo)
+          .then(response => {
+            console.log(response)
+          }).catch(error => console.log(error))
           break
         // メール配信設定
         case "option-7":

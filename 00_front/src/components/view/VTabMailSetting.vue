@@ -18,7 +18,7 @@
         variant="outlined"
         v-model='timing'
       ></v-select>
-      <input-text-field v-bind:hint='hint' ref="RefInputField" v-if="model == true"/>
+      <input-text-field v-bind:hint='hint' v-bind:initText="currentCc" ref="RefInputField" v-if="model == true"/>
     </div>
   </div>
 </template>
@@ -34,8 +34,15 @@ export default {
   data(){
     return {
       model: true,
-      hint: "CC設定(複数の場合はコロン区切り)。オーナーな自動でCCに追加されます",
+      hint: "CC設定(複数の場合はコロン区切り)。オーナーは自動でCCに追加されます",
       timing: 1,
+    }
+  },
+  props:{
+    currentCc:{
+      type: String,
+      required: true,
+      default: () => "",
     }
   },
   methods:{
