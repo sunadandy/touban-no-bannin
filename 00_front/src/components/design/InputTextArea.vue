@@ -13,14 +13,19 @@ export default {
   name: "InputTextArea",
   data(){
     return{
-      inputData: "",
+      inputData: this.currentMessage
     }
   },
   props:{
     hint:{
       type: String,
       require: true
-    }
+    },
+    currentMessage: {
+      type: String,
+      require: true,
+      default: () => "",
+    },
   }
 }
 </script>

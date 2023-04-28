@@ -1,10 +1,7 @@
 <template>
   <div>
     <calc-member-info ref="RefCaclcMemberInfo"/>
-    <setting
-      v-bind:current_memberInfo="current_memberInfo"
-      ref="RefSetting"
-    />
+    <setting ref="RefSetting"/>
     <v-btn flat rounded="pill" color="primary" @click="Update">更新</v-btn>
     <v-overlay :model-value="overlay" class="align-center justify-center">
       <v-progress-circular
@@ -30,7 +27,6 @@ export default {
     return {
       toubanId: -1,
       current_toubanInfo: {},
-      current_memberInfo: [],
       currentOwner: "",
       overlay: false,
     }
@@ -89,6 +85,12 @@ export default {
           break
         // メッセージ設定
         case "option-4":
+          var updateToubanInfo = this.current_toubanInfo
+          updateToubanInfo.message = result.data
+          this.axios.put("/touban", updateToubanInfo)
+          .then(response => {
+            console.log(response)
+          }).catch(error => console.log(error))
           break
           // 順番変更
         case "option-5":
@@ -109,7 +111,6 @@ export default {
     const toubanInfo = this.$store.getters.GetToubanByID(this.toubanId)
     this.current_toubanInfo = toubanInfo[0]  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
     this.currentOwner = this.current_toubanInfo.owner
-    this.current_memberInfo = this.$store.getters.GetMemberByToubanId(this.toubanId)
   }
 }
 </script>

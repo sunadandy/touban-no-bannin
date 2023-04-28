@@ -78,7 +78,7 @@
           <v-window-item value="option-4">
             <v-card flat>
               メンバーに伝えたいメッセージを入力してください。(サーバの参照資料等)<br>
-              <input-text-area ref="RefInputArea"/>
+              <input-text-area ref="RefInputArea" v-bind:currentMessage="currentMessage"/>
             </v-card>
           </v-window-item>
           <v-window-item value="option-5">
@@ -131,6 +131,7 @@ export default {
       tab: 'option-2',
       hint: "当番名を設定してください",
       memberInfo: [],   //{"employeeNo", "name", "email"}のJSON配列
+      currentMessage: "",
     }
   },
   props:{
@@ -140,11 +141,6 @@ export default {
       require: true,
       default: () => false,
     },
-    current_memberInfo: {
-      type: Array,
-      require: true,
-      default: () => [],
-    }
   },
   methods: {
     PageBack(){
@@ -278,11 +274,18 @@ export default {
     }
   },
   created(){
-    this.memberInfo = this.current_memberInfo.map((info) => ({
-      name: info.name,
-      emplyoeeNo: info.emplyoee_number,
-      email: info.email,
-    }))
+    // Create/Editでどういった項目、初期値を表示するかはSettingの責務。なので親からは必要以上にデータを渡さない
+    if(!this.limited){
+      const toubanId = this.$route.params.id
+      const currentToubanInfo = this.$store.getters.GetToubanByID(toubanId)
+      const currentMemberInfo = this.$store.getters.GetMemberByToubanId(toubanId)
+      this.memberInfo = currentMemberInfo.map((info) => ({
+        name: info.name,
+        emplyoeeNo: info.emplyoee_number,
+        email: info.email,
+      }))
+      this.currentMessage = currentToubanInfo[0].message
+    }
   },
 }
 </script>

@@ -4,9 +4,6 @@
       <p>・メンバーは担当順にソートされます。</p>
       <p>・オーナーは赤字で表示されます。</p>
     </div>
-    <div class="owner-message">
-      {{ message }}
-    </div>
     <div class="show-view">
       <v-table density="compact">
         <thead>
@@ -39,6 +36,10 @@
         </tbody>
       </v-table>
     </div>
+    <div class="box28">
+      <span class="box-title">管理者からのメッセージ</span>
+      <p>{{ message }}</p>
+    </div>
   </div>
 </template>
 
@@ -48,18 +49,20 @@ export default {
   data(){
     return {
       member: [],
-      owner: ""
+      owner: "",
+      message: ""
     }
   },
   create(){
     // websocket代替
     location.reload()
   },
-  mounted(){
+  created(){
     const toubanId = this.$route.params.id
     // オーナーの把握
     const toubanInfo = this.$store.getters.GetToubanByID(toubanId)
     this.owner = toubanInfo[0].owner  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
+    this.message = toubanInfo[0].message
     // メンバーの取得
     this.member = this.$store.getters.GetMemberByToubanId(toubanId)
   }
@@ -75,5 +78,28 @@ export default {
 }
 .coloring{
   color: red
+}
+.box28 {
+    position: relative;
+    margin: 2em 0;
+    padding: 25px 10px 7px;
+    border: solid 2px #FFC107;
+}
+.box28 .box-title {
+    position: absolute;
+    display: inline-block;
+    top: -2px;
+    left: -2px;
+    padding: 0 9px;
+    height: 25px;
+    line-height: 25px;
+    font-size: 17px;
+    background: #FFC107;
+    color: #ffffff;
+    font-weight: bold;
+}
+.box28 p {
+    margin: 0; 
+    padding: 0;
 }
 </style>
