@@ -4,13 +4,15 @@
     <calc-member-info ref="RefCaclcMemberInfo"/>
     
     <v-btn flat rounded="pill" color="primary" @click="Validation">設定完了</v-btn>
-    <input-dialog ref="RefDialog" v-bind:selected='selected' @CloseDialog="Register"/>
+    <v-dialog v-model="dialog" persistent width="1024">
+      <input-dialog v-bind:hints="hints" @clickSubmit="onSubmit" @clickClose="onClose"/>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import Setting from '@/components/Setting'
-import InputDialog from '@/components/view/InputDialog'
+import InputDialog from '@/components/design/InputDialog'
 import CalcMemberInfo from '@/components/module/CalcMemberInfo'
 
 // グローバル変数
@@ -20,7 +22,8 @@ export default {
   name: 'CreateView',
   data(){
     return{
-      selected:[],
+      dialog: false,
+      hints: ["当番のオーナーの社員番号を入力してください", "パスワードを設定してください"]
     }
   },
   components: { 
@@ -32,23 +35,20 @@ export default {
     Validation(){
       // 子コンポーネント(setting)にバリデーション要求
       result = this.$refs.RefSetting.Validation()
-      if(result.status){
-        // オーナーとパスワードの設定
-        this.selected = this.$refs.RefSetting.GetSelected()
-        this.$refs.RefDialog.OpenDialog()
-      }else{
+      if(!result.status){
         alert("いずれかの入力に不備があります。")
+        return false
       }
+      // オーナーとパスワードの設定
+      this.dialog = true
     },
-    Register(payload){
+    Register(owner, password){
       var newTouban = {}
       var newMember = {}
       const maxToubanId = this.$store.state.currenToubanTable.reduce((prev, current) => {
         return (prev.id > current.id) ? prev.id : current.id
       }, 0);
       const nextToubanId = maxToubanId + 1
-      const owner = payload.owner
-      const password = payload.password
 
       newTouban.id = nextToubanId
       newTouban.title = result.data[0].data
@@ -74,8 +74,27 @@ export default {
           )
       }).catch(error => console.log(error))      
 
-
       this.$router.push("/home")
+    },
+    onClose(){
+      this.dialog = false
+    },
+    onSubmit(payload) {
+      const ownerNumber = payload[0]
+      const password = payload[1]
+      const selected = this.$refs.RefSetting.GetSelected()
+      console.log(selected)
+
+      // 入力された社員番号がアドレス帳に登録されている番号かどうかチェック
+      for(var i=0; i<selected.length; i++){
+        if(selected[i].emplyoeeNo == ownerNumber){
+          const owner = selected[i].name
+          this.Register(owner, password)
+          this.dialog = false
+          return true   //これがないと必ずalertを実行してしまうので必須
+        }
+      }
+      alert("オーナーが選択メンバーに含まれていません。")
     },
   }
 }
