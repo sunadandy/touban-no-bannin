@@ -50,6 +50,7 @@ export default {
       this.$emit('clickClose')
     },
     Submit(){
+      this.returnData = []  //初期化。これがないとずっとpushされる
       this.hints.forEach((hint, index) => {
         this.returnData.push(this.$refs[`RefInputField${index}`][0].inputData)
       });

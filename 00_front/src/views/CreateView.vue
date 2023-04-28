@@ -83,7 +83,12 @@ export default {
       const ownerNumber = payload[0]
       const password = payload[1]
       const selected = this.$refs.RefSetting.GetSelected()
-      console.log(selected)
+
+      // パスワードの空白チェック
+      if(password == ""){
+        alert("パスワードが空白です。")
+        return false
+      }
 
       // 入力された社員番号がアドレス帳に登録されている番号かどうかチェック
       for(var i=0; i<selected.length; i++){
