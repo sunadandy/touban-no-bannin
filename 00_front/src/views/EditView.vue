@@ -6,6 +6,13 @@
       ref="RefSetting"
     />
     <v-btn flat rounded="pill" color="primary" @click="Update">更新</v-btn>
+    <v-overlay :model-value="overlay" class="align-center justify-center">
+      <v-progress-circular
+        color="primary"
+        indeterminate
+        size="64"
+      ></v-progress-circular>
+    </v-overlay>
   </div>
 </template>
 
@@ -25,7 +32,15 @@ export default {
       current_toubanInfo: {},
       current_memberInfo: [],
       currentOwner: "",
+      overlay: false,
     }
+  },
+  watch: {
+    overlay (val) {
+      val && setTimeout(() => {
+        this.overlay = false
+      }, 500)
+    },
   },
   methods:{
     Update(){
@@ -85,6 +100,8 @@ export default {
         case "option-7":
           break
       }
+      // 更新を視覚的に通知するための演出
+      this.overlay = true
     },
   },
   created(){
