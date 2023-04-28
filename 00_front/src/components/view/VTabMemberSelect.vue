@@ -7,8 +7,8 @@
       multiple="multiple"
       size="20"
     >
-      <option v-for="item in selectable" :key="item.employeeNo">{{ item.name }}</option>
-      <option v-for="item in memberInfo" :key="item.employeeNo" selected>{{ item.name }}</option>
+      <option v-for="item in selectable" :key="item.employeeNo">{{ item.affiliation }},{{ item.name }}</option>
+      <option v-for="item in memberInfo" :key="item.employeeNo" selected>{{ item.affiliation }},{{ item.name }}</option>
     </select>
   </div>
 </template>
@@ -24,8 +24,8 @@ export default {
   },
   data(){
     return{
-      selectable: [], //{"employeeNo", "name", "email"}のJSON配列
-      member: [],     //{"employeeNo", "name", "email"}のJSON配列
+      selectable: [], //{"affiliation", "employeeNo", "name", "email"}のJSON配列
+      member: [],     //{"affiliation", "employeeNo", "name", "email"}のJSON配列
     }
   },
   props:{
@@ -43,7 +43,9 @@ export default {
       for ( var i=0,l=selected.length; l>i; i++ ) {
         for(var j=0; j < this.selectable.length; j++){
           // 必ずどこかで一致する
-          if(selected[i].value == this.selectable[j].name){
+          const value = selected[i].value
+          const name = value.split(",")[1]
+          if(name == this.selectable[j].name){
             jsonArray.push(this.selectable[j])
             break
           }

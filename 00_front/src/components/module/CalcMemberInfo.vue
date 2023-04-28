@@ -21,6 +21,7 @@ export default {
         for(var i=0; i<selected.length; i++){
           var memberInfo = {}
           memberInfo.touban_id = parseInt(toubanId)
+          memberInfo.affiliation = selected[i].affiliation
           memberInfo.name = selected[i].name
           memberInfo.emplyoee_number = "E" + selected[i].emplyoeeNo   //バックエンド側で数値文字列を上手く扱えないのでE付きに。
           memberInfo.order_number = currentMaxOrder + 1
@@ -51,6 +52,7 @@ export default {
             if(i == current_memberInfos.length-1){
               var memberInfo = {}
               memberInfo.touban_id = parseInt(toubanId)
+              memberInfo.affiliation = selected[j].affiliation
               memberInfo.name = selected[j].name
               memberInfo.emplyoee_number = "E" + selected[j].emplyoeeNo   //バックエンド側で数値文字列を上手く扱えないのでE付きに。
               memberInfo.order_number = currentMaxOrder + 1

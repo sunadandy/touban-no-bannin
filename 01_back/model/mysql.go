@@ -25,6 +25,7 @@ type StTouban struct {
 type StMember struct {
 	Touban_id       int    `json:"touban_id"`
 	Name            string `json:"name"`
+	Affiliation     string `json:"affiliation"`
 	Employee_number string `json:"emplyoee_number"`
 	Email           string `json:"email"`
 	Order_number    int    `json:"order_number"`

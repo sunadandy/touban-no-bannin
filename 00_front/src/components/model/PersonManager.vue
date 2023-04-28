@@ -17,9 +17,10 @@ export default {
   mounted(){
     for(var i=0, l=this.csvData.length; i < l; i++){
       var item = {}
-      item["emplyoeeNo"] = this.csvData[i][3]
-      item["name"] = this.csvData[i][4]
-      item["email"] = this.csvData[i][6]
+      item["affiliation"] = this.csvData[i][3]
+      item["emplyoeeNo"] = this.csvData[i][4]
+      item["name"] = this.csvData[i][5]
+      item["email"] = this.csvData[i][7]
       this.userData.push(item)
     }
   }

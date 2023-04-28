@@ -280,6 +280,7 @@ export default {
       const currentToubanInfo = this.$store.getters.GetToubanByID(toubanId)
       const currentMemberInfo = this.$store.getters.GetMemberByToubanId(toubanId)
       this.memberInfo = currentMemberInfo.map((info) => ({
+        affiliation: info.affiliation,
         name: info.name,
         emplyoeeNo: info.emplyoee_number,
         email: info.email,
