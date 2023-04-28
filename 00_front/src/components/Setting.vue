@@ -65,7 +65,7 @@
           </v-window-item>
           <v-window-item value="option-2">
             <v-card flat>
-              <member-select ref="RefMemberSelect"/>
+              <member-select ref="RefMemberSelect" v-bind:memberInfo="memberInfo"/>
             </v-card>
           </v-window-item>
           <v-window-item value="option-3">
@@ -129,9 +129,8 @@ export default {
     return {
       // [Issue]本当はoption-1にしたいが、1にするとmultiselectがレンダリングされない
       tab: 'option-2',
-      toubanInfo: ["id", "title", "owner", "start", "interval_type", "mail", "timing", "message", "password"],
-      member: [],   //memberInfoを格納する配列
       hint: "当番名を設定してください",
+      memberInfo: [],   //{"employeeNo", "name", "email"}のJSON配列
     }
   },
   props:{
@@ -140,6 +139,11 @@ export default {
       type: Boolean,
       require: true,
       default: () => false,
+    },
+    current_memberInfo: {
+      type: Array,
+      require: true,
+      default: () => [],
     }
   },
   methods: {
@@ -273,12 +277,13 @@ export default {
       }
     }
   },
-  mounted(){
-    if(this.limited){
-      const toubanId = this.$route.params.id
-      this.member = this.$store.getters.GetMemberByToubanId(toubanId)
-    }
-  }
+  created(){
+    this.memberInfo = this.current_memberInfo.map((info) => ({
+      name: info.name,
+      emplyoeeNo: info.emplyoee_number,
+      email: info.email,
+    }))
+  },
 }
 </script>
 

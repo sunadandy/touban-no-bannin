@@ -2,7 +2,6 @@
   <div>
     <calc-member-info ref="RefCaclcMemberInfo"/>
     <setting
-      v-bind:current_toubanInfo="current_toubanInfo"
       v-bind:current_memberInfo="current_memberInfo"
       ref="RefSetting"
     />
@@ -24,6 +23,7 @@ export default {
     return {
       toubanId: -1,
       current_toubanInfo: {},
+      current_memberInfo: [],
       currentOwner: "",
     }
   },
@@ -87,11 +87,12 @@ export default {
       }
     },
   },
-  mounted(){
+  created(){
     this.toubanId = this.$route.params.id
     const toubanInfo = this.$store.getters.GetToubanByID(this.toubanId)
     this.current_toubanInfo = toubanInfo[0]  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
     this.currentOwner = this.current_toubanInfo.owner
+    this.current_memberInfo = this.$store.getters.GetMemberByToubanId(this.toubanId)
   }
 }
 </script>

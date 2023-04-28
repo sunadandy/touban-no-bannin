@@ -8,6 +8,7 @@
       size="20"
     >
       <option v-for="item in selectable" :key="item.employeeNo">{{ item.name }}</option>
+      <option v-for="item in memberInfo" :key="item.employeeNo" selected>{{ item.name }}</option>
     </select>
   </div>
 </template>
@@ -24,6 +25,14 @@ export default {
   data(){
     return{
       selectable: [], //{"employeeNo", "name", "email"}のJSON配列
+      member: [],     //{"employeeNo", "name", "email"}のJSON配列
+    }
+  },
+  props:{
+    memberInfo: {
+      type: Array,
+      required: true,
+      default: () => [],
     }
   },
   methods:{
@@ -43,10 +52,26 @@ export default {
       return jsonArray
     },
   },
+  created(){
+    this.member = this.memberInfo
+  },
   mounted(){
     // アドレス帳から取得したデータ（名前、社員番号、メールアドレスの連想配列）
     this.selectable = this.$refs.RefPersonManager.userData
-    
+
+    // 親コンポーネントから取得したcurrentMemberInfoと照合して一致する名前をselectableから削除
+    if(this.member.length != 0){
+      for(var i=0; i < this.selectable.length; i++){
+        for(var j=0; j < this.member.length; j++){
+          if(this.selectable[i].name == this.member[j].name){
+            this.selectable.splice(i, 1)
+            i-- // 削除された要素のインデックスを調整
+            break
+          }
+        }
+      }
+    }
+  
     // DOMの更新を待ってから処理。nextTickがないとメンバーが表示されない
     this.$nextTick(function() {
       // MultiSelectedTableのマウント
