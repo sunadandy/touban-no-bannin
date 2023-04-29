@@ -22,19 +22,23 @@
         <v-btn color="blue-darken-1" variant="text" @click="Submit">送信</v-btn>
       </v-card-actions>
     </v-card>
+    <overlay ref="RefOverlay" v-bind:waitTime="waitTime"/>
   </div>
 </template>
 
 <script>
 import InputTextField from '@/components/design/InputTextField'
+import Overlay from '@/components/design/Overlay'
 
 export default {
   name: 'InputDialog',
   components: { 
     InputTextField,
+    Overlay,
   },
   data(){
     return {
+      waitTime: 500,    //オーバーレイコンポーネントに渡すパラメータ
       returnData: [],
     }
   },
@@ -54,7 +58,11 @@ export default {
       this.hints.forEach((hint, index) => {
         this.returnData.push(this.$refs[`RefInputField${index}`][0].inputData)
       });
-      this.$emit('clickSubmit', this.returnData)
+      // 演出
+      this.$refs.RefOverlay.SetOverlay()
+      setTimeout(() => {
+        this.$emit('clickSubmit', this.returnData)
+      }, this.waitTime)
     },
   },
 }

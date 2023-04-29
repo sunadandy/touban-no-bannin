@@ -3,40 +3,29 @@
     <calc-member-info ref="RefCaclcMemberInfo"/>
     <setting ref="RefSetting"/>
     <v-btn flat rounded="pill" color="primary" @click="Update">更新</v-btn>
-    <v-overlay :model-value="overlay" class="align-center justify-center">
-      <v-progress-circular
-        color="primary"
-        indeterminate
-        size="64"
-      ></v-progress-circular>
-    </v-overlay>
+    <overlay ref="RefOverlay" v-bind:waitTime="waitTime"/>
   </div>
 </template>
 
 <script>
 import Setting from '@/components/Setting'
 import CalcMemberInfo from '@/components/module/CalcMemberInfo'
+import Overlay from '@/components/design/Overlay'
 
 export default {
   name: 'EditView',
   components: { 
     Setting,
     CalcMemberInfo,
+    Overlay,
   },
   data(){
     return {
       toubanId: -1,
+      waitTime: 500,    //オーバーレイコンポーネントに渡すパラメータ
       current_toubanInfo: {},
       currentOwner: "",
-      overlay: false,
     }
-  },
-  watch: {
-    overlay (val) {
-      val && setTimeout(() => {
-        this.overlay = false
-      }, 500)
-    },
   },
   methods:{
     Update(){
@@ -129,7 +118,7 @@ export default {
           break
       }
       // 更新を視覚的に通知するための演出
-      this.overlay = true
+      this.$refs.RefOverlay.SetOverlay()
     },
   },
   created(){
