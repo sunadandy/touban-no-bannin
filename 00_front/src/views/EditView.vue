@@ -118,6 +118,14 @@ export default {
           break
         // メール配信設定
         case "option-7":
+          var updateToubanInfo = this.current_toubanInfo
+          updateToubanInfo.mailing = result.data.mailing
+          updateToubanInfo.timing = result.data.timing
+          updateToubanInfo.cc = result.data.cc
+          this.axios.put("/touban", updateToubanInfo)
+          .then(response => {
+            console.log(response)
+          }).catch(error => console.log(error))
           break
       }
       // 更新を視覚的に通知するための演出

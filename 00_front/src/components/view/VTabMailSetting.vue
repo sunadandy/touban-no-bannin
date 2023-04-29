@@ -33,7 +33,7 @@ export default {
   },
   data(){
     return {
-      model: true,
+      model: this.isValid,
       hint: "CC設定(複数の場合はコロン区切り)。オーナーは自動でCCに追加されます",
       timing: 1,
     }
@@ -43,20 +43,25 @@ export default {
       type: String,
       required: true,
       default: () => "",
+    },
+    isValid:{
+      type: Boolean,
+      required: true,
+      default: () => true,
     }
   },
   methods:{
     GetMailSetting(){
-      if(this.model === false){
+      if(this.model == false){
         return {
-          mailing: this.model,
-          timing: 1,  //デフォルト値
-          cc: "",     //デフォルト値。string型なのでnullはNG
+          mailing: this.model,     //MYSQLでのbooleanがtinyintなので0/1に変換
+          timing: null,  //デフォルト値
+          cc: null,
         }
       }else{
         var cc = this.$refs.RefInputField.inputData
         return {
-          mailing: this.model,
+          mailing: this.model,   //MYSQLでのbooleanがtinyintなので0/1に変換
           timing: this.timing,
           cc: cc,
         }

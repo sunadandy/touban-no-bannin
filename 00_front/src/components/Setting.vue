@@ -95,7 +95,7 @@
           </v-window-item>
           <v-window-item value="option-7">
             <v-card flat>
-              <mail-setting ref="RefMail" v-bind:currentCc="currentCc"/>
+              <mail-setting ref="RefMail" v-bind:currentCc="currentCc" v-bind:isValid="currentMailing"/>
             </v-card>
           </v-window-item>
         </v-window>
@@ -134,6 +134,7 @@ export default {
       memberInfo: [],   //{"employeeNo", "name", "email"}のJSON配列
       currentMessage: "",
       currentCc: "",
+      currentMailing: true,
     }
   },
   props:{
@@ -282,6 +283,7 @@ export default {
       this.currentMemberInfo = this.$store.getters.GetMemberByToubanId(toubanId).sort((a, b) => a.order_number - b.order_number)
       this.currentMessage = currentToubanInfo[0].message
       this.currentCc = currentToubanInfo[0].cc
+      this.currentMailing = currentToubanInfo[0].mailing
     }
   },
 }

@@ -78,6 +78,9 @@ func (stTouban StTouban) CreateTouban() error {
 	if err != nil {
 		return err
 	}
+	// 何故かbooleanのカラムは個別書き込みでないとfalseが書けないのでもう一文
+	id := stTouban.Id
+	db.Table(toubanTbl).Where("id = ?", id).Update("mailing", stTouban.Mailing)
 	return nil
 }
 
@@ -95,6 +98,8 @@ func ReadTouban() (string, error) {
 func (stTouban StTouban) UpdateTouban() int64 {
 	id := stTouban.Id
 	result := db.Table(toubanTbl).Where("id = ?", id).Update(&stTouban)
+	// 何故かbooleanのカラムは個別書き込みでないとfalseが書けないのでもう一文
+	db.Table(toubanTbl).Where("id = ?", id).Update("mailing", stTouban.Mailing)
 	// Updateはエラーを返さないので更新された行数で成否を判断
 	return result.RowsAffected
 }
