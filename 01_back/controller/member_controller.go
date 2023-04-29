@@ -10,7 +10,7 @@ import (
 
 type AccessMember interface {
 	CreateMember() error
-	UpdateMember() error
+	UpdateMember() int64
 }
 
 func GetMember(c *gin.Context) {
@@ -39,12 +39,31 @@ func PostMember(c *gin.Context) {
 	}
 
 }
-func AddMember(accessO AccessMember) error {
-	return accessO.CreateMember()
+func AddMember(accessM AccessMember) error {
+	return accessM.CreateMember()
 }
 
 func PutMember(c *gin.Context) {
-	print("TBD")
+	stMembers := model.NewMembers() //オーダー構造体を配列で取得
+	var err error
+
+	// POSTで受け取ったJSONを構造体にマッピング
+	err = c.ShouldBindJSON(&stMembers)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	} else {
+		// データベースに追加
+		for _, jsonData := range stMembers {
+			changedColumns := UpdateMember(jsonData)
+			if changedColumns != 0 {
+				c.JSON(http.StatusOK, gin.H{"data": "Success!"})
+			}
+			// c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+	}
+}
+func UpdateMember(accessM AccessMember) int64 {
+	return accessM.UpdateMember()
 }
 
 func DeleteMember(c *gin.Context) {

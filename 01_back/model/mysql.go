@@ -124,8 +124,12 @@ func ReadMember() string {
 	return string(jsonData)
 }
 
-func (stMember StMember) UpdateMember() error {
-	return nil
+func (stMember StMember) UpdateMember() int64 {
+	id := stMember.Touban_id
+	name := stMember.Name
+	result := db.Table(memberTbl).Where("touban_id = ? AND name = ?", id, name).Update(&stMember)
+	// Updateはエラーを返さないので更新された行数で成否を判断
+	return result.RowsAffected
 }
 
 func DeleteMember(toubanId int) {

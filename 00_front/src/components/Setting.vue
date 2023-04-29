@@ -65,7 +65,7 @@
           </v-window-item>
           <v-window-item value="option-2">
             <v-card flat>
-              <member-select ref="RefMemberSelect" v-bind:memberInfo="memberInfo"/>
+              <member-select ref="RefMemberSelect" v-bind:currentMemberInfo="currentMemberInfo"/>
             </v-card>
           </v-window-item>
           <v-window-item value="option-3">
@@ -85,12 +85,12 @@
             <v-card flat>
               ※注意※  更新すると元の順番には戻せません。<br>
               <!-- オリジナルを渡すとスワップ時にオリジナルまでスワップされるのでコピーを渡す -->
-              <drag-drop-swap ref="RefDragDropSwap" v-bind:dataList="member.concat()"/>
+              <drag-drop-swap ref="RefDragDropSwap" v-bind:dataList="currentMemberInfo.concat()"/>
             </v-card>
           </v-window-item>
           <v-window-item value="option-6">
             <v-card flat>
-              <owner-setting v-bind:memberList="memberInfo" ref="RefOwner"></owner-setting>
+              <owner-setting v-bind:memberList="currentMemberInfo" ref="RefOwner"></owner-setting>
             </v-card>
           </v-window-item>
           <v-window-item value="option-7">
@@ -130,6 +130,7 @@ export default {
       // [Issue]本当はoption-1にしたいが、1にするとmultiselectがレンダリングされない
       tab: 'option-2',
       hint: "当番名を設定してください",
+      currentMemberInfo: [],
       memberInfo: [],   //{"employeeNo", "name", "email"}のJSON配列
       currentMessage: "",
       currentCc: "",
@@ -278,13 +279,7 @@ export default {
     if(!this.limited){
       const toubanId = this.$route.params.id
       const currentToubanInfo = this.$store.getters.GetToubanByID(toubanId)
-      const currentMemberInfo = this.$store.getters.GetMemberByToubanId(toubanId)
-      this.memberInfo = currentMemberInfo.map((info) => ({
-        affiliation: info.affiliation,
-        name: info.name,
-        emplyoeeNo: info.emplyoee_number,
-        email: info.email,
-      }))
+      this.currentMemberInfo = this.$store.getters.GetMemberByToubanId(toubanId).sort((a, b) => a.order_number - b.order_number)
       this.currentMessage = currentToubanInfo[0].message
       this.currentCc = currentToubanInfo[0].cc
     }

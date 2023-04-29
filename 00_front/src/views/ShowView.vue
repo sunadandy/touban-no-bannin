@@ -64,7 +64,7 @@ export default {
     this.owner = toubanInfo[0].owner  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
     this.message = toubanInfo[0].message
     // メンバーの取得
-    this.member = this.$store.getters.GetMemberByToubanId(toubanId)
+    this.member = this.$store.getters.GetMemberByToubanId(toubanId).sort((a, b) => a.order_number - b.order_number)
   }
 }
 </script>

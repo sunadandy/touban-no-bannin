@@ -8,7 +8,7 @@
       size="20"
     >
       <option v-for="item in selectable" :key="item.employeeNo">{{ item.affiliation }},{{ item.name }}</option>
-      <option v-for="item in memberInfo" :key="item.employeeNo" selected>{{ item.affiliation }},{{ item.name }}</option>
+      <option v-for="item in currentMemberInfo" :key="item.employeeNo" selected>{{ item.affiliation }},{{ item.name }}</option>
     </select>
   </div>
 </template>
@@ -24,29 +24,29 @@ export default {
   },
   data(){
     return{
+      userData: [], //CSVからのオリジナルデータ。変更してはいけない
       selectable: [], //{"affiliation", "employeeNo", "name", "email"}のJSON配列
-      member: [],     //{"affiliation", "employeeNo", "name", "email"}のJSON配列
+      member: [], //{"affiliation", "employeeNo", "name", "email"}のJSON配列
     }
   },
   props:{
-    memberInfo: {
+    currentMemberInfo: {
       type: Array,
       required: true,
       default: () => [],
     }
   },
   methods:{
-    // selectableはJSONだが、selectedはnameのみ
     GetSelected(){
       const selected = document.getElementById("m-selected")
       var jsonArray = []
       for ( var i=0,l=selected.length; l>i; i++ ) {
-        for(var j=0; j < this.selectable.length; j++){
+        for(var j=0; j < this.userData.length; j++){
           // 必ずどこかで一致する
           const value = selected[i].value
           const name = value.split(",")[1]
-          if(name == this.selectable[j].name){
-            jsonArray.push(this.selectable[j])
+          if(name == this.userData[j].name){
+            jsonArray.push(this.userData[j])
             break
           }
         }
@@ -55,11 +55,19 @@ export default {
     },
   },
   created(){
-    this.member = this.memberInfo
+    this.member = this.currentMemberInfo.map(member => {
+      return {
+        name: member.name,
+        affiliation: member.affiliation,
+        email: member.emial,
+        emplopeeNo: member.employeeNo,
+      }
+    })
   },
   mounted(){
     // アドレス帳から取得したデータ（名前、社員番号、メールアドレスの連想配列）
-    this.selectable = this.$refs.RefPersonManager.userData
+    this.userData = this.$refs.RefPersonManager.userData
+    this.selectable = this.userData.concat()    //複製
 
     // 親コンポーネントから取得したcurrentMemberInfoと照合して一致する名前をselectableから削除
     if(this.member.length != 0){

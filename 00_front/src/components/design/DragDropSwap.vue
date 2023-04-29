@@ -5,13 +5,13 @@
       v-bind:class="index === dragIndex ? 'dragging' : ''"
     >
       <li
-        draggable="true"
-        @dragstart="dragStart($event, index)"
-        @drop.stop="dragStop($event, index)"
-        @dragenter="dragEnter($event, index)"
-        @dragover.prevent
+      draggable="true"
+      @dragstart="dragStart($event, index)"
+      @drop.stop="dragStop($event, index)"
+      @dragenter="dragEnter($event, index)"
+      @dragover.prevent
       >
-        {{ data.name }}
+      {{ data.name }}
       </li>
     </ul>
   </div>
@@ -22,7 +22,8 @@ export default {
   name: 'DragDropSwap',
   data(){
     return{
-      dragIndex: null
+      dragIndex: null,
+      // dataList: this.memberList,
     }
   },
   props:{

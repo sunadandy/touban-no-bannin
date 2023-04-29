@@ -55,6 +55,7 @@ export default {
         })
         if(!foundOwner){
           alert("オーナーが選択されていません")
+          return false
         }
       }
       
@@ -95,6 +96,14 @@ export default {
           break
           // 順番変更
         case "option-5":
+          var newOrder = result.data
+          newOrder.forEach((element, index) => {
+            element.order_number = index + 1
+          });
+          this.axios.put("/member", newOrder)
+          .then(response => {
+            console.log(response)
+          }).catch(error => console.log(error))
           break
         // オーナー変更
         case "option-6":
