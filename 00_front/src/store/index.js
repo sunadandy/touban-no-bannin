@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { createStore } from 'vuex'
+import createPersistedState from 'vuex-persistedstate'
 
 export default createStore({
   state: {
@@ -40,6 +41,17 @@ export default createStore({
       // .catch(error => console.log(error))
     }
   },
-  modules: {
-  }
+  plugins: [createPersistedState(
+    {
+      // ストレージのキーを指定。デフォルトではvuex
+      key: 'touiban_no_bannin',
+      // 管理対象のステートを指定
+      paths: [
+        'currenToubanTable',
+        'currentOrderTable',
+      ],
+      // ストレージの種類を指定。デフォルトではローカルストレージ
+      storage: window.sessionStorage,
+    }
+  )]
 })

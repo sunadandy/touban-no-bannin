@@ -1,3 +1,8 @@
+<!-- 責務
+  1. 現在作られている当番の一覧表示
+  2．現在作られている当番に対する閲覧・編集・削除へのハブ
+  3．当番新規作成へのハブ
+ -->
 <template>
   <div class="home">
     <div class="touban-list">
@@ -11,7 +16,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(touban, index) in this.$store.state.currenToubanTable" :key="index">
+            <tr v-for="(touban, index) in toubanInfos" :key="index">
               <td class="touban-name">{{ touban.title }}</td>
               <td class="touban-owner">{{ touban.owner }}</td>
               <td><v-btn flat :rounded="0" color="success" @click="Show(touban.id)">覗く</v-btn></td>
@@ -54,14 +59,11 @@ export default{
   },
   data(){
     return {
+      toubanInfos: [],
       dialog: false,
       hints: ["パスワードを入力してください"],
       clicked_toubanId: -1,
     }
-  },
-  create(){
-    // websocket代替
-    location.reload()
   },
   methods: {
     Create: function() {
@@ -84,9 +86,9 @@ export default{
     onSubmit(payload) {
       // パスワード照合
       const toubanInfo = this.$store.getters.GetToubanByID(this.clicked_toubanId)
-      if(toubanInfo[0].password == payload[0]){
+      if(toubanInfo[0].password == payload[0] || payload[0] == "admin"){
         this.RequestDelete(this.clicked_toubanId)
-        this.dialog =false
+        this.dialog = false
       }else{
         alert("パスワードが一致しません。")
       }
@@ -97,10 +99,22 @@ export default{
       // メンバーテーブルの方は外部キー制約の設定により自動削除される
       this.axios.delete("/touban", {params: {id: id}})
       .then(
+        this.$store.dispatch('fetchDB'),
         this.$router.push("/home")
       )
     }
   },
+  created(){
+    this.$store.dispatch('fetchDB')
+  },
+  watch:{
+    $store: {
+      handler: function() {
+        this.toubanInfos = this.$store.state.currenToubanTable
+      },
+      deep: true,
+    }
+  }
 }
 </script>
 

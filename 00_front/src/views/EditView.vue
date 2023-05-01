@@ -71,12 +71,12 @@ export default {
           const day = parseInt(data[1])
           const startDate = this.current_toubanInfo.start
           updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(updateMemberInfos, interval, day, startDate)
-          // // 古いメンバー情報を削除
-          // this.axios.delete("/member", {params:{id: this.toubanId}})
-          // .then(response => {
-          //   // 新しいメンバー情報を登録
-          //   this.axios.post("/member", updateMemberInfos)
-          // }).catch(error => console.log(error))
+          // 古いメンバー情報を削除
+          this.axios.delete("/member", {params:{id: this.toubanId}})
+          .then(response => {
+            // 新しいメンバー情報を登録
+            this.axios.post("/member", updateMemberInfos)
+          }).catch(error => console.log(error))
           break
         // スケジュール設定
         case "option-3":

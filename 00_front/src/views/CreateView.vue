@@ -91,7 +91,7 @@ export default {
       const selected = this.$refs.RefSetting.GetSelected()
 
       // パスワードの空白チェック
-      if(password == ""){
+      if(password == "" || password == null || password == undefined){
         alert("パスワードが空白です。")
         return false
       }

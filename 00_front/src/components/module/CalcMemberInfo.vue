@@ -131,7 +131,6 @@ export default {
           }
         })
       }
-      console.log(memberInfos)
       return memberInfos
     },
   },
