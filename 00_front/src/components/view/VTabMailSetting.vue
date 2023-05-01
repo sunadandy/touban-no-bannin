@@ -1,3 +1,9 @@
+<!-- 責務
+  1．メール機能全般に関する設定
+    1. 利用有無の
+    2. 通知のタイミング
+    3. CC
+ -->
 <template>
   <div class="vtab-setting">
     <div>
@@ -52,21 +58,21 @@ export default {
   },
   methods:{
     GetMailSetting(){
-      if(this.model == false){
+      const cc = this.$refs.RefInputField.inputData
+      if(!this.model){
         return {
-          mailing: this.model,     //MYSQLでのbooleanがtinyintなので0/1に変換
+          mailing: this.model,
           timing: null,  //デフォルト値
           cc: null,
         }
       }else{
-        var cc = this.$refs.RefInputField.inputData
         return {
-          mailing: this.model,   //MYSQLでのbooleanがtinyintなので0/1に変換
+          mailing: this.model,
           timing: this.timing,
           cc: cc,
         }
       }
-    }
-  }
+    },
+  },
 }
 </script>

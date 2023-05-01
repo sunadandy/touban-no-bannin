@@ -59,7 +59,8 @@
           <v-window-item value="option-1">
             <v-card flat>
               <v-card-text>
-                <input-text-field ref="RefInputField" v-bind:hint='hint'/>
+                当番名を設定してください。<br>
+                <input-text-field ref="RefInputField"/>
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -129,9 +130,7 @@ export default {
     return {
       // [Issue]本当はoption-1にしたいが、1にするとmultiselectがレンダリングされない
       tab: 'option-2',
-      hint: "当番名を設定してください",
       currentMemberInfo: [],
-      memberInfo: [],   //{"employeeNo", "name", "email"}のJSON配列
       currentMessage: "",
       currentCc: "",
       currentMailing: true,
@@ -258,14 +257,19 @@ export default {
           break
         // メール配信設定
         case "option-7":
-          try{
-            data = this.$refs.RefMail.GetMailSetting()
-            status = true
-          }catch{
-            // 子コンポーネントがインスタンス化されていない状態でdataプロパティにアクセスした場合に例外発生
-            data = null
-            status = false
-          }
+          data = this.$refs.RefMail.GetMailSetting()
+          // CCのバリデーション
+          const ccs = data.cc.split(";")
+          ccs.forEach(cc => {
+            if(!cc.includes("@jtekt.co.jp") && !cc.match(/@jtekt\.co\.jp[^;]/) && cc != ""){
+              alert("CCに設定された文字列が不適切です。")
+              data = null
+              status = false
+              return
+            }else{
+              status = true
+            }
+          });
           break
       }
 
