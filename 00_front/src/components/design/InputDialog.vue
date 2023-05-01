@@ -10,8 +10,6 @@
                 <input-text-field :ref="`RefInputField${index}`" v-bind:hint='hint'/>
               </v-col>
             </div>
-            <v-col cols="12" sm="6">
-            </v-col>
           </v-row>
         </v-container>
         <!-- <small>*登録成功時、自動でホームに戻ります。</small> -->

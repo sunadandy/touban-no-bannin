@@ -4,7 +4,7 @@
     <calc-member-info ref="RefCaclcMemberInfo"/>
     
     <v-btn flat rounded="pill" color="primary" @click="Validation">設定完了</v-btn>
-    <v-dialog v-model="dialog" persistent width="1024">
+    <v-dialog v-model="dialog" persistent width="600">
       <input-dialog v-bind:hints="hints" @clickSubmit="onSubmit" @clickClose="onClose"/>
     </v-dialog>
   </div>

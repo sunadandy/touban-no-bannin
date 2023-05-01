@@ -2,44 +2,48 @@
   <div>
     <calc-member-info ref="RefCaclcMemberInfo"/>
     <setting ref="RefSetting"/>
-    <v-btn flat rounded="pill" color="primary" @click="Update">更新</v-btn>
-    <overlay ref="RefOverlay" v-bind:waitTime="waitTime"/>
+    <v-btn flat rounded="pill" color="primary" @click="onClick">更新</v-btn>
+    <v-dialog v-model="dialog" persistent width="600">
+      <input-dialog v-bind:hints="hints" @clickSubmit="onSubmit" @clickClose="onClose"/>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import Setting from '@/components/Setting'
 import CalcMemberInfo from '@/components/module/CalcMemberInfo'
-import Overlay from '@/components/design/Overlay'
+import InputDialog from '@/components/design/InputDialog'
 
 export default {
   name: 'EditView',
   components: { 
     Setting,
     CalcMemberInfo,
-    Overlay,
+    InputDialog,
   },
   data(){
     return {
       toubanId: -1,
-      waitTime: 500,    //オーバーレイコンポーネントに渡すパラメータ
+      dialog: false,
+      hints: ["パスワードを入力してください"],
       current_toubanInfo: {},
       current_memberInfos: [],
+      result: {},
     }
   },
   methods:{
-    Update(){
+    onClick(){
       // 子(Setting)に入力項目のチェックを要求
-      var result = this.$refs.RefSetting.Validation()
+      this.result = this.$refs.RefSetting.Validation()
       // status=falseなら終了
-      if(!result.status){
+      if(!this.result.status){
         // alert(`${result.tab}の設定が正しくありません`)
         return
       }
 
       // selectedにオーナーが含まれていない場合はNG
-      if(result.tab == "option-2"){
-        const foundOwner = result.data.some((item) => {
+      if(this.result.tab == "option-2"){
+        const foundOwner = this.result.data.some((item) => {
           return item.name.includes(this.current_toubanInfo.owner)
         })
         if(!foundOwner){
@@ -47,13 +51,18 @@ export default {
           return false
         }
       }
-      
+      this.dialog = true
+    },
+    onClose(){
+      this.dialog = false
+    },
+    onSubmit(){
       // データベース更新(アクティブタブ単位でデータを取得)
-      switch(result.tab){
+      switch(this.result.tab){
         // 当番名
         case "option-1":
           var updateToubanInfo = this.current_toubanInfo
-          updateToubanInfo.title = result.data
+          updateToubanInfo.title = this.result.data
           this.axios.put("/touban", updateToubanInfo)
           .then(response => {
             console.log(response)
@@ -61,7 +70,7 @@ export default {
           break
         // メンバー編集
         case "option-2":
-          const selected = result.data
+          const selected = this.result.data
           // メンバーの更新
           var updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReplaceMember(this.current_memberInfos, selected)
           // 変更したメンバーの次回実施予定日設定
@@ -82,8 +91,8 @@ export default {
         case "option-3":
           // 当番情報の更新
           var updateToubanInfo = this.current_toubanInfo
-          const newScheduling = result.data.scheduling
-          const newStartDate = result.data.startDate
+          const newScheduling = this.result.data.scheduling
+          const newStartDate = this.result.data.startDate
           updateToubanInfo.scheduling = newScheduling
           updateToubanInfo.start = newStartDate
           // 次回実施日のリスケ
@@ -102,7 +111,7 @@ export default {
         // メッセージ設定
         case "option-4":
           var updateToubanInfo = this.current_toubanInfo
-          updateToubanInfo.message = result.data
+          updateToubanInfo.message = this.result.data
           this.axios.put("/touban", updateToubanInfo)
           .then(response => {
             console.log(response)
@@ -110,7 +119,7 @@ export default {
           break
           // 順番変更
         case "option-5":
-          var newOrder = result.data
+          var newOrder = this.result.data
           newOrder.forEach((element, index) => {
             element.order_number = index + 1
           });
@@ -122,9 +131,9 @@ export default {
         // オーナー変更
         case "option-6":
           var updateToubanInfo = this.current_toubanInfo
-          updateToubanInfo.owner = result.data.owner
-          updateToubanInfo.password = result.data.password
-          updateToubanInfo.cc = updateToubanInfo.cc + ";" + result.data.email
+          updateToubanInfo.owner = this.result.data.owner
+          updateToubanInfo.password = this.result.data.password
+          updateToubanInfo.cc = updateToubanInfo.cc + ";" + this.result.data.email
           this.axios.put("/touban", updateToubanInfo)
           .then(response => {
             console.log(response)
@@ -133,17 +142,16 @@ export default {
         // メール配信設定
         case "option-7":
           var updateToubanInfo = this.current_toubanInfo
-          updateToubanInfo.mailing = result.data.mailing
-          updateToubanInfo.timing = result.data.timing
-          updateToubanInfo.cc = result.data.cc
+          updateToubanInfo.mailing = this.result.data.mailing
+          updateToubanInfo.timing = this.result.data.timing
+          updateToubanInfo.cc = this.result.data.cc
           this.axios.put("/touban", updateToubanInfo)
           .then(response => {
             console.log(response)
           }).catch(error => console.log(error))
           break
       }
-      // 更新を視覚的に通知するための演出
-      this.$refs.RefOverlay.SetOverlay()
+      this.dialog = false
     },
   },
   created(){

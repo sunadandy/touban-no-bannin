@@ -28,7 +28,7 @@
       </v-row>
     </div>
     <div>
-      <v-dialog v-model="dialog" persistent width="1024">
+      <v-dialog v-model="dialog" persistent width="600">
         <input-dialog v-bind:hints="hints" @clickSubmit="onSubmit" @clickClose="onClose"/>
       </v-dialog>
     </div>
