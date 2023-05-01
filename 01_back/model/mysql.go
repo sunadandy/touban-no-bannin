@@ -9,16 +9,16 @@ import (
 
 // 当番テーブル(JSON)をマッピングする構造体
 type StTouban struct {
-	Id            int    `json:"id" gorm:"AUTO_INCREMENT"`
-	Title         string `json:"title"`
-	Owner         string `json:"owner"`
-	Start         string `json:"start"`
-	Interval_type int    `json:"interval_type"`
-	Mailing       bool   `json:"mailing"`
-	Timing        int    `json:"timing"`
-	Message       string `json:"message"`
-	Password      string `json:"password"`
-	Cc            string `json:"cc"`
+	Id         int    `json:"id" gorm:"AUTO_INCREMENT"`
+	Title      string `json:"title"`
+	Owner      string `json:"owner"`
+	Start      string `json:"start"`
+	Scheduling string `json:"scheduling"`
+	Mailing    bool   `json:"mailing"`
+	Timing     int    `json:"timing"`
+	Message    string `json:"message"`
+	Password   string `json:"password"`
+	Cc         string `json:"cc"`
 }
 
 // 順番テーブル(JSON)をマッピングする構造体

@@ -45,25 +45,28 @@ export default {
     Register(owner, password){
       var newTouban = {}
       var newMember = {}
+      // 追加する当番のIDを計算
       const maxToubanId = this.$store.state.currenToubanTable.reduce((prev, current) => {
         return (prev.id > current.id) ? prev.id : current.id
       }, 0);
       const nextToubanId = maxToubanId + 1
+      // メンバー選択情報取得
+      const selected = result.data[1].data
       // オーナーのメールアドレス取得
-      const ownerData = result.data[1].data.find(data => data.name == owner);
+      const ownerData = selected.find(data => data.name == owner);
       const email = ownerData ? ownerData.email : "";
 
       newTouban.id = nextToubanId
       newTouban.title = result.data[0].data
       newTouban.owner = owner
       newTouban.start = result.data[2].data.startDate
-      newTouban.interval_type = parseInt(result.data[2].data.interval)
+      newTouban.scheduling = result.data[2].data.scheduling
       newTouban.mailing = result.data[4].data.mailing
       newTouban.timing = result.data[4].data.timing
       newTouban.message = result.data[3].data
       newTouban.password = password
       newTouban.cc = email + ";" + result.data[4].data.cc   //オーナーはCCに自動追加
-      newMember = this.$refs.RefCaclcMemberInfo.CalcuNewMemberInfo(nextToubanId, newTouban.interval_type, result.data[1].data)
+      newMember = this.$refs.RefCaclcMemberInfo.CalcuNewMemberInfo(newTouban, selected)
 
       // 当番テーブルに新規追加
       this.axios.post("/touban", newTouban)

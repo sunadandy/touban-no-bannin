@@ -212,9 +212,10 @@ export default {
         // スケジュール設定
         case "option-3":
           try{
-            const interval = this.$refs.RefSchedule.interval
-            const startDate = this.$refs.RefSchedule.date
-            data = {interval, startDate}  //連想配列の時点でintから勝手にStringになるっぽい
+            const settingInfo = this.$refs.RefSchedule.GetScheduleSetting()
+            const scheduling = settingInfo.scheduling
+            const startDate = settingInfo.startDate
+            data = {scheduling, startDate}
             status = true
           }catch{
             // 子コンポーネントがインスタンス化されていない状態でdataプロパティにアクセスした場合に例外発生
@@ -352,5 +353,6 @@ export default {
 }
 .vtab-setting{
   margin-left: 10px;
+  font-size: 16px;
 }
 </style>

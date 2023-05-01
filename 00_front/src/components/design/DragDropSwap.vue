@@ -52,18 +52,21 @@ export default {
 
 <style scoped>
 .dd-box {
-    list-style: none;
-    padding: 2px;
+  width: 200px;
+  display:flex;
+  flex-flow: column;
+  padding: 5px 1em;
+  text-align: center;
 }
 .dd-box li {
-    user-select: none;
-    box-shadow: 0 0 2px 1px rgba(0, 0, 0, .2);
-    cursor: grab;
-    transition: box-shadow .3s;
-    padding: 3px 2em;
-    font-size: 13px;
-    display: table-cell;
-    vertical-align: middle;
+  user-select: none;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, .2);
+  cursor: grab;
+  transition: box-shadow .3s;
+  padding: 5px 2em;
+  font-size: 16px;
+  display: table-cell;
+  vertical-align: middle;
 }
 .dragging {
   background-color: #b4b4b4;

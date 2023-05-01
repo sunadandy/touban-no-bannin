@@ -24,7 +24,7 @@ export default {
       toubanId: -1,
       waitTime: 500,    //オーバーレイコンポーネントに渡すパラメータ
       current_toubanInfo: {},
-      currentOwner: "",
+      current_memberInfos: [],
     }
   },
   methods:{
@@ -40,7 +40,7 @@ export default {
       // selectedにオーナーが含まれていない場合はNG
       if(result.tab == "option-2"){
         const foundOwner = result.data.some((item) => {
-          return item.name.includes(this.currentOwner)
+          return item.name.includes(this.current_toubanInfo.owner)
         })
         if(!foundOwner){
           alert("オーナーが選択されていません")
@@ -62,17 +62,42 @@ export default {
         // メンバー編集
         case "option-2":
           const selected = result.data
-          const interval_type = this.current_toubanInfo.interval_type
-          const updateMemberInfos = this.$refs.RefCaclcMemberInfo.CalcuNewMemberInfo(this.toubanId, interval_type, selected)
-          // 古いメンバー情報を削除
-          this.axios.delete("/member", {params:{id: this.toubanId}})
-          .then(response => {
-            // 新しいメンバー情報を登録
-            this.axios.post("/member", updateMemberInfos)
-          }).catch(error => console.log(error))
+          // メンバーの更新
+          var updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReplaceMember(this.current_memberInfos, selected)
+          // 変更したメンバーの次回実施予定日設定
+          const scheduling = this.current_toubanInfo.scheduling
+          var data = scheduling.split("-")
+          const interval = parseInt(data[0])
+          const day = parseInt(data[1])
+          const startDate = this.current_toubanInfo.start
+          updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(updateMemberInfos, interval, day, startDate)
+          // // 古いメンバー情報を削除
+          // this.axios.delete("/member", {params:{id: this.toubanId}})
+          // .then(response => {
+          //   // 新しいメンバー情報を登録
+          //   this.axios.post("/member", updateMemberInfos)
+          // }).catch(error => console.log(error))
           break
         // スケジュール設定
         case "option-3":
+          // 当番情報の更新
+          var updateToubanInfo = this.current_toubanInfo
+          const newScheduling = result.data.scheduling
+          const newStartDate = result.data.startDate
+          updateToubanInfo.scheduling = newScheduling
+          updateToubanInfo.start = newStartDate
+          // 次回実施日のリスケ
+          var data = newScheduling.split("-")
+          const newInterval = parseInt(data[0])
+          const newDay = parseInt(data[1])
+          var updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(this.current_memberInfos.sort((a, b) => a.order_number - b.order_number), newInterval, newDay, newStartDate)
+          this.axios.put("/touban", updateToubanInfo)
+          .then(response => {
+            this.axios.put("/member", updateMemberInfos)
+            .then(response => {
+              console.log(response)
+            }).catch(error => console.log(error))
+          }).catch(error => console.log(error))
           break
         // メッセージ設定
         case "option-4":
@@ -125,7 +150,7 @@ export default {
     this.toubanId = this.$route.params.id
     const toubanInfo = this.$store.getters.GetToubanByID(this.toubanId)
     this.current_toubanInfo = toubanInfo[0]  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
-    this.currentOwner = this.current_toubanInfo.owner
+    this.current_memberInfos = this.$store.getters.GetMemberByToubanId(this.toubanId)
   }
 }
 </script>
