@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 	"touban/controller"
+	"touban/email"
 	"touban/model"
 
 	"github.com/gin-gonic/gin"
@@ -31,7 +32,7 @@ func DailyTask() {
 	for {
 		// 毎日23時にタスクが走るように設定
 		now := time.Now()
-		target := time.Date(now.Year(), now.Month(), now.Day(), 11, 50, 0, 0, time.Local)
+		target := time.Date(now.Year(), now.Month(), now.Day(), 23, 50, 0, 0, time.Local)
 		if target.Before(now) {
 			target = target.AddDate(0, 0, 1)
 		}
@@ -42,10 +43,13 @@ func DailyTask() {
 		// 最終実施日の更新
 		UpdateLastDate()
 		// メールの配信
-		// SendEmail()
+		email.ActionRemind()
 	}
 }
 
+// ------------------------------------------------------------------------------------
+// メンバーテーブルの最終実施日更新
+// ------------------------------------------------------------------------------------
 func UpdateLastDate() {
 	stMembers := model.NewMembers()
 	// メンバーテーブルを取得

@@ -1,6 +1,6 @@
 FROM mysql:5.7
 
-# # [TODO]本来書くべきではない情報
+# [TODO]本来書くべきではない情報
 ENV MYSQL_ROOT_PASSWORD=root
 ENV MYSQL_DATABASE=toubanDB
 

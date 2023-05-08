@@ -20,6 +20,7 @@ type StTouban struct {
 	Password   string `json:"password"`
 	Cc         string `json:"cc"`
 }
+type Toubans []StTouban
 
 // 順番テーブル(JSON)をマッピングする構造体
 type StMember struct {
@@ -42,8 +43,8 @@ func DBConnect() {
 	DBMS := "mysql"
 	USER := "root"
 	PASS := "root"
-	// PROTOCOL := "tcp(touban_cont:3306)"
-	PROTOCOL := "tcp(172.19.0.2:3306)" //MySQLコンテナのIP
+	PROTOCOL := "tcp(touban_db_cont:3306)"
+	// PROTOCOL := "tcp(172.18.0.2:3306)" //MySQLコンテナのIP
 	DB := "toubanDB"
 
 	connection := USER + ":" + PASS + "@" + PROTOCOL + "/" + DB
@@ -56,18 +57,17 @@ func DBConnect() {
 }
 
 func NewTouban() StTouban {
-	stTouban := StTouban{}
-	return stTouban
+	return StTouban{}
+}
+func NewToubans() Toubans {
+	return Toubans{}
 }
 
 func NewMember() StMember {
-	stMember := StMember{}
-	return stMember
+	return StMember{}
 }
-
 func NewMembers() Members {
-	members := Members{}
-	return members
+	return Members{}
 }
 
 // ---------------------------------------------------------------
