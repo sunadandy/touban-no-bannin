@@ -1,3 +1,4 @@
+mysqldump: [Warning] Using a password on the command line interface can be insecure.
 -- MySQL dump 10.13  Distrib 5.7.42, for Linux (x86_64)
 --
 -- Host: localhost    Database: toubanDB
@@ -16,19 +17,23 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `orderTbl`
+-- Table structure for table `memberTbl`
 --
 
-DROP TABLE IF EXISTS `orderTbl`;
+DROP TABLE IF EXISTS `memberTbl`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `orderTbl` (
+CREATE TABLE `memberTbl` (
   `touban_id` int(11) DEFAULT NULL,
-  `name` varchar(10) DEFAULT NULL,
-  `employee_number` smallint(5) unsigned DEFAULT NULL,
+  `name` varchar(30) DEFAULT NULL,
+  `employee_number` varchar(10) DEFAULT NULL,
   `order_number` smallint(5) unsigned DEFAULT NULL,
   `last` date DEFAULT NULL,
-  `next` date DEFAULT NULL
+  `next` date DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `affiliation` varchar(10) DEFAULT NULL,
+  KEY `link_touban` (`touban_id`),
+  CONSTRAINT `link_touban` FOREIGN KEY (`touban_id`) REFERENCES `toubanTbl` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -44,13 +49,15 @@ CREATE TABLE `toubanTbl` (
   `title` varchar(255) DEFAULT NULL,
   `owner` varchar(10) DEFAULT NULL,
   `start` date DEFAULT NULL,
-  `interval_type` smallint(5) unsigned DEFAULT NULL,
-  `mail` tinyint(1) DEFAULT NULL,
-  `remind` smallint(5) unsigned DEFAULT NULL,
+  `scheduling` varchar(10) DEFAULT NULL,
+  `mailing` tinyint(1) DEFAULT NULL,
+  `timing` int(11) DEFAULT NULL,
   `message` text,
   `password` varchar(255) DEFAULT NULL,
+  `cc` varchar(255) DEFAULT NULL,
+  UNIQUE KEY `id_2` (`id`),
   KEY `id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -62,4 +69,4 @@ CREATE TABLE `toubanTbl` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-04-23 13:55:58
+-- Dump completed on 2023-05-08  6:02:32

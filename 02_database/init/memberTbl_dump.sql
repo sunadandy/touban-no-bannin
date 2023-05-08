@@ -1,3 +1,4 @@
+mysqldump: [Warning] Using a password on the command line interface can be insecure.
 -- MySQL dump 10.13  Distrib 5.7.42, for Linux (x86_64)
 --
 -- Host: localhost    Database: toubanDB
@@ -27,13 +28,15 @@ CREATE TABLE `toubanTbl` (
   `title` varchar(255) DEFAULT NULL,
   `owner` varchar(10) DEFAULT NULL,
   `start` date DEFAULT NULL,
-  `interval_type` smallint(5) unsigned DEFAULT NULL,
-  `mail` tinyint(1) DEFAULT NULL,
-  `remind` smallint(5) unsigned DEFAULT NULL,
+  `scheduling` varchar(10) DEFAULT NULL,
+  `mailing` tinyint(1) DEFAULT NULL,
+  `timing` int(11) DEFAULT NULL,
   `message` text,
   `password` varchar(255) DEFAULT NULL,
+  `cc` varchar(255) DEFAULT NULL,
+  UNIQUE KEY `id_2` (`id`),
   KEY `id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -42,7 +45,7 @@ CREATE TABLE `toubanTbl` (
 
 LOCK TABLES `toubanTbl` WRITE;
 /*!40000 ALTER TABLE `toubanTbl` DISABLE KEYS */;
-INSERT INTO `toubanTbl` VALUES (1,'テスト','yamada','2023-01-01',0,0,0,'','');
+INSERT INTO `toubanTbl` VALUES (10,'サンプル10','市川 誠','2023-05-01','3-3',1,1,'あｓふぁｓふぁ','167564','');
 /*!40000 ALTER TABLE `toubanTbl` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -55,4 +58,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-04-24  9:57:34
+-- Dump completed on 2023-05-08  6:02:36
