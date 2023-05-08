@@ -16,27 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `memberTbl`
---
-
-DROP TABLE IF EXISTS `memberTbl`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `memberTbl` (
-  `touban_id` int(11) DEFAULT NULL,
-  `name` varchar(30) DEFAULT NULL,
-  `employee_number` varchar(10) DEFAULT NULL,
-  `order_number` smallint(5) unsigned DEFAULT NULL,
-  `last` date DEFAULT NULL,
-  `next` date DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `affiliation` varchar(10) DEFAULT NULL,
-  KEY `link_touban` (`touban_id`),
-  CONSTRAINT `link_touban` FOREIGN KEY (`touban_id`) REFERENCES `toubanTbl` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `toubanTbl`
 --
 
@@ -58,6 +37,16 @@ CREATE TABLE `toubanTbl` (
   KEY `id` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `toubanTbl`
+--
+
+LOCK TABLES `toubanTbl` WRITE;
+/*!40000 ALTER TABLE `toubanTbl` DISABLE KEYS */;
+INSERT INTO `toubanTbl` VALUES (10,'サンプル10','市川 誠','2023-05-01','3-3',1,1,'あｓふぁｓふぁ','167564','');
+/*!40000 ALTER TABLE `toubanTbl` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -68,4 +57,4 @@ CREATE TABLE `toubanTbl` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-08  6:29:03
+-- Dump completed on 2023-05-08  6:29:34
