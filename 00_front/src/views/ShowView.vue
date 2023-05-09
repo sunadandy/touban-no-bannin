@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="abst">
-      <p>・メンバーは担当順にソートされます。</p>
-      <p>・オーナーは赤字で表示されます。</p>
+    <div class="box28">
+      <span class="box-title">管理者からのメッセージ</span>
+      <pre>{{ message }}</pre>
     </div>
     <div class="show-view">
       <v-table density="compact">
@@ -36,9 +36,9 @@
         </tbody>
       </v-table>
     </div>
-    <div class="box28">
-      <span class="box-title">管理者からのメッセージ</span>
-      <p>{{ message }}</p>
+    <div class="note">
+      <p>・メンバーは担当順にソートされます。</p>
+      <p>・オーナーは赤字で表示されます。</p>
     </div>
   </div>
 </template>
@@ -66,7 +66,7 @@ export default {
 </script>
 
 <style scoped>
-.abst{
+.note{
   padding-bottom: 1em;
 }
 .v-table{
@@ -97,5 +97,8 @@ export default {
 .box28 p {
     margin: 0; 
     padding: 0;
+}
+pre {
+  font-family: Arial, sans-serif;
 }
 </style>

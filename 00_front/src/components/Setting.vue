@@ -1,9 +1,7 @@
 <template>
   <div class="setting">
     <v-card class="setting-vcard">
-      <v-toolbar
-        color="primary"
-      >
+      <v-toolbar color="primary">
         <v-toolbar-title>当番の作成・編集</v-toolbar-title>
       </v-toolbar>
       <div class="d-flex flex-row">
