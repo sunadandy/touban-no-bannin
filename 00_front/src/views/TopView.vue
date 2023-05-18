@@ -16,7 +16,7 @@ export default {
   methods: {
     RingAudio: function() {
       this.audio.currentTime = 0 // 連続で鳴らせるように
-      this.audio.play() // 鳴らす
+      // this.audio.play() // 鳴らす
       this.$router.push("/home")
     },
   }

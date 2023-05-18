@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 	"touban/controller"
 	"touban/email"
@@ -32,7 +33,7 @@ func DailyTask() {
 	for {
 		// 毎日23時にタスクが走るように設定
 		now := time.Now()
-		target := time.Date(now.Year(), now.Month(), now.Day(), 23, 50, 0, 0, time.Local)
+		target := time.Date(now.Year(), now.Month(), now.Day(), 23, 50, 00, 0, time.Local)
 		if target.Before(now) {
 			target = target.AddDate(0, 0, 1)
 		}
@@ -40,8 +41,9 @@ func DailyTask() {
 		timer := time.NewTimer(d)
 		<-timer.C
 
-		// 最終実施日の更新
-		UpdateLastDate()
+		// 日付情報の更新
+		IsDateUpdateNeeded()
+
 		// メールの配信
 		email.ActionRemind()
 	}
@@ -50,26 +52,63 @@ func DailyTask() {
 // ------------------------------------------------------------------------------------
 // メンバーテーブルの最終実施日更新
 // ------------------------------------------------------------------------------------
-func UpdateLastDate() {
-	stMembers := model.NewMembers()
-	// メンバーテーブルを取得
-	jsonData := model.ReadMember()
-	err := json.Unmarshal([]byte(jsonData), &stMembers)
-	if err == nil {
-		now := time.Now()
-		today := now.Format("2006-01-02")
+func IsDateUpdateNeeded() {
+	// 当番テーブル取得
+	stToubans := model.NewToubans()
+	jsonData, _ := model.ReadTouban()
+	json.Unmarshal([]byte(jsonData), &stToubans)
+	// 日付情報取得
+	now := time.Now()
+	today := now.Format("2006-01-02")
+
+	for _, touban := range stToubans {
+		// 当番IDと一致するメンバーテーブル取得
+		stMembers := model.NewMembers()
+		jsonData := model.ReadMemberByToubanId(touban.Id)
+		json.Unmarshal([]byte(jsonData), &stMembers)
+
+		// 次回実施日が今日だった場合は最終実施日を更新
 		for _, stMember := range stMembers {
 			if stMember.Next == today {
 				stMember.Last = today
-				// メンバー情報を更新(戻り値は使わない)
-				LastDateUpdate(stMember)
+				date := CalcuNextDate(stMembers, touban.Scheduling)
+				stMember.Next = date
+				// データ更新
+				DateUpdate(stMember)
+				break
 			}
 		}
+	}
+}
+
+func CalcuNextDate(members model.Members, shedule string) string {
+	var date string
+	var maxDate time.Time
+
+	// MAX次回実施日を取得
+	for _, member := range members {
+		next, _ := time.Parse("2006-01-02", member.Next)
+		if maxDate.IsZero() || next.After(maxDate) {
+			maxDate = next
+		}
+	}
+	// 次回実施日計算
+	interval := strings.Split(shedule, "-")[0]
+	if interval == "1" {
+		date = maxDate.AddDate(0, 0, 7).Format("2006-01-02")
+	} else if interval == "2" {
+		date = maxDate.AddDate(0, 0, 14).Format("2006-01-02")
+	} else if interval == "3" {
+		date = maxDate.AddDate(0, 0, 21).Format("2006-01-02")
+	} else if interval == "4" {
+		date = maxDate.AddDate(0, 0, 28).Format("2006-01-02")
 	} else {
-		print(err.Error())
+		date = maxDate.Format("2006-01-02")
 	}
 
+	return date
 }
-func LastDateUpdate(accessM controller.AccessMember) int64 {
+
+func DateUpdate(accessM controller.AccessMember) int64 {
 	return accessM.UpdateMember()
 }

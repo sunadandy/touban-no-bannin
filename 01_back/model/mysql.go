@@ -129,6 +129,16 @@ func ReadMember() string {
 	return string(jsonData)
 }
 
+func ReadMemberByToubanId(id int) string {
+	stMember := []StMember{}
+	db.Table(memberTbl).Where("touban_id = ?", id).Find(&stMember)
+	jsonData, err := json.Marshal(&stMember)
+	if err != nil {
+		print(err)
+	}
+	return string(jsonData)
+}
+
 func (stMember StMember) UpdateMember() int64 {
 	id := stMember.Touban_id
 	name := stMember.Name
