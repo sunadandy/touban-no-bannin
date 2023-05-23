@@ -6,6 +6,6 @@ WORKDIR /touban-no-bannin
 COPY . /touban-no-bannin/
 
 RUN npm ci
-RUN npm run build
+# RUN npm run build
 
 CMD ["npm", "run", "serve"]

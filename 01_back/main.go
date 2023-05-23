@@ -31,9 +31,9 @@ func main() {
 
 func DailyTask() {
 	for {
-		// 毎日23時にタスクが走るように設定
+		// 毎日23時にタスクが走るように設定(コンテナの手タイムゾーンがUTCなので9時間の誤差を考慮)
 		now := time.Now()
-		target := time.Date(now.Year(), now.Month(), now.Day(), 23, 50, 00, 0, time.Local)
+		target := time.Date(now.Year(), now.Month(), now.Day(), 14, 50, 00, 0, time.Local)
 		if target.Before(now) {
 			target = target.AddDate(0, 0, 1)
 		}

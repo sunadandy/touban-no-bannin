@@ -9,6 +9,7 @@ module.exports = {
       ]
     }
   },
+  publicPath: './',
   // CORS(Access-Control-Allow-Origin)エラー対策
   // フロントとバックでOrigiが異なるためエラーになる模様。リクエスト時にURLを付与しても駄目なのでconfigで指定
   devServer: {
