@@ -8,7 +8,6 @@ import (
 	"touban/email"
 	"touban/model"
 
-	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,7 +16,6 @@ func main() {
 	model.DBConnect()
 
 	router := gin.Default()
-	router.Use(static.Serve("/touban-no-bannin", static.LocalFile("dist", false)))
 	router.GET("/touban", controller.GetTouban)
 	router.POST("/touban", controller.PostTouban)
 	router.PUT("/touban", controller.PutTouban)
@@ -69,18 +67,14 @@ func IsDateUpdateNeeded() {
 		jsonData := model.ReadMemberByToubanId(touban.Id)
 		json.Unmarshal([]byte(jsonData), &stMembers)
 
-		// 次回実施日が今日の日付だったメンバーを探して最終実施日を更新
-		for i, stMember := range stMembers {
+		// 次回実施日が今日だった場合は最終実施日を更新
+		for _, stMember := range stMembers {
 			if stMember.Next == today {
-				// 最終実施日を今日に変更
 				stMember.Last = today
-				// 次回実施日を設定
 				date := CalcuNextDate(stMembers, touban.Scheduling)
 				stMember.Next = date
-				DateUpdateMember(stMember)
-				// 次回実施日を当番の開始日に設定
-				touban.Start = stMembers[i+1].Next
-				DateUpdateTouban(touban)
+				// データ更新
+				DateUpdate(stMember)
 				break
 			}
 		}
@@ -109,12 +103,7 @@ func CalcuNextDate(members model.Members, shedule string) string {
 	} else if interval == "4" {
 		date = maxDate.AddDate(0, 0, 28).Format("2006-01-02")
 	} else if interval == "0" {
-		// 金曜日かどうか判定
-		if maxDate.Weekday() == time.Friday {
-			date = maxDate.AddDate(0, 0, 3).Format("2006-01-02")
-		} else {
-			date = maxDate.AddDate(0, 0, 1).Format("2006-01-02")
-		}
+		date = maxDate.AddDate(0, 0, 1).Format("2006-01-02")
 	} else {
 		date = maxDate.Format("2006-01-02")
 	}
@@ -122,9 +111,6 @@ func CalcuNextDate(members model.Members, shedule string) string {
 	return date
 }
 
-func DateUpdateMember(accessM controller.AccessMember) int64 {
+func DateUpdate(accessM controller.AccessMember) int64 {
 	return accessM.UpdateMember()
-}
-func DateUpdateTouban(accessM controller.AccessTouban) int64 {
-	return accessM.UpdateTouban()
 }
