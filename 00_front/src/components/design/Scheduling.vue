@@ -2,7 +2,7 @@
   <div>
     <div class="scheduling">
       <v-radio-group v-model="scheValue">
-        <v-radio label="毎日" value=0></v-radio>
+        <v-radio label="平日毎日" value=0></v-radio>
         <v-radio label="1週間毎(毎週)" value=1></v-radio>
         <v-radio label="2週間毎(隔週)" value=2></v-radio>
         <v-radio label="3週間毎" value=3></v-radio>

@@ -106,7 +106,13 @@ export default {
         if(interval == 0){
           memberInfos.forEach(memberInfo => {
             memberInfo.next = next
-            next = format(addDays(parse(next, 'yyyy-MM-dd', new Date()), 1), 'yyyy-MM-dd')
+            var date = parse(next, 'yyyy-MM-dd', new Date())
+            // 金曜日かどうか判定
+            if(date.getDay()  == 5){
+              next = format(addDays(date, 3), 'yyyy-MM-dd')
+            }else{
+              next = format(addDays(date, 1), 'yyyy-MM-dd')
+            }
           });
         }else if(interval >= 1 && interval <= 4){
           memberInfos.forEach(memberInfo => {
@@ -123,7 +129,13 @@ export default {
           if(memberInfo.order_number == nextOrder){
             memberInfo.next = next
             if(interval == 0){
-              next = format(addDays(parse(next, 'yyyy-MM-dd', new Date()), 1), 'yyyy-MM-dd')
+              var date = parse(next, 'yyyy-MM-dd', new Date())
+              // 金曜日かどうか判定
+              if(date.getDay()  == 5){
+                next = format(addDays(date, 3), 'yyyy-MM-dd')
+              }else{
+                next = format(addDays(date, 1), 'yyyy-MM-dd')
+              }
             }else if(interval >= 1 && interval <= 4){
               next = format(startOfWeek(add(parse(next, 'yyyy-MM-dd', new Date()), { weeks: interval }), { weekStartsOn: day }), 'yyyy-MM-dd')
             }
@@ -136,7 +148,13 @@ export default {
           if(memberInfo.order_number <= lastOrder){
             memberInfo.next = next
             if(interval == 0){
-              next = format(addDays(parse(next, 'yyyy-MM-dd', new Date()), 1), 'yyyy-MM-dd')
+              var date = parse(next, 'yyyy-MM-dd', new Date())
+              // 金曜日かどうか判定
+              if(date.getDay()  == 5){
+                next = format(addDays(date, 3), 'yyyy-MM-dd')
+              }else{
+                next = format(addDays(date, 1), 'yyyy-MM-dd')
+              }
             }else if(interval >= 1 && interval <= 4){
               next = format(startOfWeek(add(parse(next, 'yyyy-MM-dd', new Date()), { weeks: interval }), { weekStartsOn: day }), 'yyyy-MM-dd')
             }

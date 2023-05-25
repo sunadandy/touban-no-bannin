@@ -103,7 +103,12 @@ func CalcuNextDate(members model.Members, shedule string) string {
 	} else if interval == "4" {
 		date = maxDate.AddDate(0, 0, 28).Format("2006-01-02")
 	} else if interval == "0" {
-		date = maxDate.AddDate(0, 0, 1).Format("2006-01-02")
+		// 金曜日かどうか判定
+		if maxDate.Weekday() == time.Friday {
+			date = maxDate.AddDate(0, 0, 3).Format("2006-01-02")
+		} else {
+			date = maxDate.AddDate(0, 0, 1).Format("2006-01-02")
+		}
 	} else {
 		date = maxDate.Format("2006-01-02")
 	}
