@@ -2,6 +2,7 @@
   <div>
     <div class="scheduling">
       <v-radio-group v-model="scheValue">
+        <v-radio label="平日毎日" value=0></v-radio>
         <v-radio label="1週間毎(毎週)" value=1></v-radio>
         <v-radio label="2週間毎(隔週)" value=2></v-radio>
         <v-radio label="3週間毎" value=3></v-radio>
@@ -18,14 +19,6 @@
         <v-radio label="木曜" value=4></v-radio>
         <v-radio label="金曜" value=5></v-radio>
       </v-radio-group>
-      <!-- 不定期の場合のセレクト -->
-      <!-- <v-select
-        label="何日に設定しますか？"
-        :items="items"
-        variant="underlined"
-        model="dateValue"
-        v-if="scheValue == 5"
-      ></v-select> -->
     </div>
   </div>
 </template>

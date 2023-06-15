@@ -56,11 +56,21 @@ export default {
   created(){
     const toubanId = this.$route.params.id
     // オーナーの把握
-    const toubanInfo = this.$store.getters.GetToubanByID(toubanId)
-    this.owner = toubanInfo[0].owner  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
-    this.message = toubanInfo[0].message
-    // メンバーの取得
-    this.member = this.$store.getters.GetMemberByToubanId(toubanId).sort((a, b) => a.order_number - b.order_number)
+    // [note]URL直接入力に対応するため、ページアクセス時にDBからデータを取得するようにする
+    this.axios.get("/touban")
+      .then(response => {
+        const toubanInfos = response.data
+        const toubanInfo = toubanInfos.filter(item => item.id == toubanId)
+        this.owner = toubanInfo[0].owner  //GetToubanByIDがレコードフィルタ結果を配列で返してくる
+        this.message = toubanInfo[0].message
+      })
+    this.axios.get("/member")
+      .then(response => {
+        const memberInfo = response.data
+        const member = memberInfo.filter(item => item.touban_id == toubanId)
+        // メンバーの取得
+        this.member = member.sort((a, b) => a.order_number - b.order_number)
+      })
   }
 }
 </script>

@@ -58,12 +58,15 @@ export default {
   },
   methods:{
     GetMailSetting(){
-      const cc = this.$refs.RefInputField.inputData
+      var cc = this.$refs.RefInputField.inputData
+      if(cc == null){cc = ""}
+      if(cc.endsWith(";")){cc = cc.slice(0, -1)}
+
       if(!this.model){
         return {
           mailing: this.model,
           timing: null,  //デフォルト値
-          cc: null,
+          cc: "",
         }
       }else{
         return {

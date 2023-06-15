@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import { parse, format, startOfToday, startOfWeek, add } from 'date-fns'
+import { parse, format, startOfToday, startOfWeek, add, addDays } from 'date-fns'
 
 export default {
   name: 'CalcMemberInfo',
@@ -30,8 +30,8 @@ export default {
       const data = toubanInfo.scheduling.split("-")
       const interval = parseInt(data[0])
       const day = parseInt(data[1])
-      const startDate = toubanInfo.start
-      new_memberInfos = this.ReSchedule(new_memberInfos, interval, day, startDate)
+      const nextDate = toubanInfo.next
+      new_memberInfos = this.ReSchedule(new_memberInfos, interval, day, nextDate)
 
       return new_memberInfos
     },
@@ -76,7 +76,7 @@ export default {
 
       return memberInfos
     },
-    ReSchedule(memberInfos, interval, day, startDate){
+    ReSchedule(memberInfos, interval, day, nextDate){
       const today = format(startOfToday(), 'yyyy-MM-dd') 
       // 今日の日付に一番近い最終実施日のインデックスを検索する
       const closestLastDateIndex = memberInfos.reduce((closestIndex, memberInfo, index) => {
@@ -99,11 +99,22 @@ export default {
         }
       }, 0)
       
-      // closestLastDateIndexがメンバーJSON配列の長さと同値の場合は新規当番作成、もしくは一度も実施していない
-      var next = startDate
+      // closestLastDateIndexがメンバーJSON配列の長さと同値の場合は新規当番作成、もしくは一度も実施していないので全員の次回実施日を設定する
+      var next = nextDate
       if(closestLastDateIndex == memberInfos.length){ 
         // 不定期以外は、order=1以外のメンバーの予定も設定
-        if(interval != 5){
+        if(interval == 0){
+          memberInfos.forEach(memberInfo => {
+            memberInfo.next = next
+            var date = parse(next, 'yyyy-MM-dd', new Date())
+            // 金曜日かどうか判定
+            if(date.getDay()  == 5){
+              next = format(addDays(date, 3), 'yyyy-MM-dd')
+            }else{
+              next = format(addDays(date, 1), 'yyyy-MM-dd')
+            }
+          });
+        }else if(interval >= 1 && interval <= 4){
           memberInfos.forEach(memberInfo => {
             memberInfo.next = next
             next = format(startOfWeek(add(parse(next, 'yyyy-MM-dd', new Date()), { weeks: interval }), { weekStartsOn: day }), 'yyyy-MM-dd')
@@ -117,7 +128,17 @@ export default {
         memberInfos.forEach((memberInfo) => {
           if(memberInfo.order_number == nextOrder){
             memberInfo.next = next
-            next = format(startOfWeek(add(parse(next, 'yyyy-MM-dd', new Date()), { weeks: interval }), { weekStartsOn: day }), 'yyyy-MM-dd')
+            if(interval == 0){
+              var date = parse(next, 'yyyy-MM-dd', new Date())
+              // 金曜日かどうか判定
+              if(date.getDay()  == 5){
+                next = format(addDays(date, 3), 'yyyy-MM-dd')
+              }else{
+                next = format(addDays(date, 1), 'yyyy-MM-dd')
+              }
+            }else if(interval >= 1 && interval <= 4){
+              next = format(startOfWeek(add(parse(next, 'yyyy-MM-dd', new Date()), { weeks: interval }), { weekStartsOn: day }), 'yyyy-MM-dd')
+            }
             nextOrder++
           }
         })
@@ -126,7 +147,17 @@ export default {
         memberInfos.forEach((memberInfo) => {
           if(memberInfo.order_number <= lastOrder){
             memberInfo.next = next
-            next = format(startOfWeek(add(parse(next, 'yyyy-MM-dd', new Date()), { weeks: interval }), { weekStartsOn: day }), 'yyyy-MM-dd')
+            if(interval == 0){
+              var date = parse(next, 'yyyy-MM-dd', new Date())
+              // 金曜日かどうか判定
+              if(date.getDay()  == 5){
+                next = format(addDays(date, 3), 'yyyy-MM-dd')
+              }else{
+                next = format(addDays(date, 1), 'yyyy-MM-dd')
+              }
+            }else if(interval >= 1 && interval <= 4){
+              next = format(startOfWeek(add(parse(next, 'yyyy-MM-dd', new Date()), { weeks: interval }), { weekStartsOn: day }), 'yyyy-MM-dd')
+            }
             nextOrder++
           }
         })

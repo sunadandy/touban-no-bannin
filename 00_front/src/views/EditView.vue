@@ -76,10 +76,10 @@ export default {
           // 変更したメンバーの次回実施予定日設定
           const scheduling = this.current_toubanInfo.scheduling
           var data = scheduling.split("-")
-          const interval = parseInt(data[0])
+          var interval = parseInt(data[0])
           const day = parseInt(data[1])
-          const startDate = this.current_toubanInfo.start
-          updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(updateMemberInfos, interval, day, startDate)
+          var nextDate = this.current_toubanInfo.next
+          updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(updateMemberInfos, interval, day, nextDate)
           // 古いメンバー情報を削除
           this.axios.delete("/member", {params:{id: this.toubanId}})
           .then(response => {
@@ -94,7 +94,7 @@ export default {
           const newScheduling = this.result.data.scheduling
           const newStartDate = this.result.data.startDate
           updateToubanInfo.scheduling = newScheduling
-          updateToubanInfo.start = newStartDate
+          updateToubanInfo.next = newStartDate
           // 次回実施日のリスケ
           var data = newScheduling.split("-")
           const newInterval = parseInt(data[0])
@@ -123,7 +123,13 @@ export default {
           newOrder.forEach((element, index) => {
             element.order_number = index + 1
           });
-          this.axios.put("/member", newOrder)
+          // 次回実施日のリスケ
+          var sch = this.current_toubanInfo.scheduling.split("-")
+          var interval = parseInt(sch[0])
+          var date = parseInt(sch[1])
+          var nextDate = this.current_toubanInfo.next
+          var updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(newOrder, interval, date, nextDate)
+          this.axios.put("/member", updateMemberInfos)
           .then(response => {
             console.log(response)
           }).catch(error => console.log(error))
