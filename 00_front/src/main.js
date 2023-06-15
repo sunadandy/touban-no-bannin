@@ -7,6 +7,8 @@ import VueAxios from 'vue-axios'
 import '@mdi/font/css/materialdesignicons.css'  // vuetifyでアイコンを表示するためのモジュール
 import store from './store'
 
+axios.defaults.baseURL = "http://" + location.hostname + ":" + location.port + "/touban-no-bannin";
+
 createApp(App)
   .use(router)
   .use(vuetify)
