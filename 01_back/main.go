@@ -67,14 +67,18 @@ func IsDateUpdateNeeded() {
 		jsonData := model.ReadMemberByToubanId(touban.Id)
 		json.Unmarshal([]byte(jsonData), &stMembers)
 
-		// 次回実施日が今日だった場合は最終実施日を更新
-		for _, stMember := range stMembers {
+		// 次回実施日が今日の日付だったメンバーを探して最終実施日を更新
+		for i, stMember := range stMembers {
 			if stMember.Next == today {
+				// 最終実施日を今日に変更
 				stMember.Last = today
+				// 次回実施日を設定
 				date := CalcuNextDate(stMembers, touban.Scheduling)
 				stMember.Next = date
-				// データ更新
-				DateUpdate(stMember)
+				DateUpdateMember(stMember)
+				// 次回実施日を当番の開始日に設定
+				touban.Start = stMembers[i+1].Next
+				DateUpdateTouban(touban)
 				break
 			}
 		}
@@ -116,6 +120,9 @@ func CalcuNextDate(members model.Members, shedule string) string {
 	return date
 }
 
-func DateUpdate(accessM controller.AccessMember) int64 {
+func DateUpdateMember(accessM controller.AccessMember) int64 {
 	return accessM.UpdateMember()
+}
+func DateUpdateTouban(accessM controller.AccessTouban) int64 {
+	return accessM.UpdateTouban()
 }

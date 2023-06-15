@@ -30,8 +30,8 @@ export default {
       const data = toubanInfo.scheduling.split("-")
       const interval = parseInt(data[0])
       const day = parseInt(data[1])
-      const startDate = toubanInfo.start
-      new_memberInfos = this.ReSchedule(new_memberInfos, interval, day, startDate)
+      const nextDate = toubanInfo.next
+      new_memberInfos = this.ReSchedule(new_memberInfos, interval, day, nextDate)
 
       return new_memberInfos
     },
@@ -76,7 +76,7 @@ export default {
 
       return memberInfos
     },
-    ReSchedule(memberInfos, interval, day, startDate){
+    ReSchedule(memberInfos, interval, day, nextDate){
       const today = format(startOfToday(), 'yyyy-MM-dd') 
       // 今日の日付に一番近い最終実施日のインデックスを検索する
       const closestLastDateIndex = memberInfos.reduce((closestIndex, memberInfo, index) => {
@@ -100,7 +100,7 @@ export default {
       }, 0)
       
       // closestLastDateIndexがメンバーJSON配列の長さと同値の場合は新規当番作成、もしくは一度も実施していないので全員の次回実施日を設定する
-      var next = startDate
+      var next = nextDate
       if(closestLastDateIndex == memberInfos.length){ 
         // 不定期以外は、order=1以外のメンバーの予定も設定
         if(interval == 0){
