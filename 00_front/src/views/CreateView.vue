@@ -59,7 +59,7 @@ export default {
       newTouban.id = nextToubanId
       newTouban.title = result.data[0].data
       newTouban.owner = owner
-      newTouban.start = result.data[2].data.startDate
+      newTouban.next = result.data[2].data.startDate
       newTouban.scheduling = result.data[2].data.scheduling
       newTouban.mailing = result.data[4].data.mailing
       newTouban.timing = result.data[4].data.timing

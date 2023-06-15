@@ -12,7 +12,7 @@ type StTouban struct {
 	Id         int    `json:"id" gorm:"AUTO_INCREMENT"`
 	Title      string `json:"title"`
 	Owner      string `json:"owner"`
-	Start      string `json:"start"`
+	Start      string `json:"next"`
 	Scheduling string `json:"scheduling"`
 	Mailing    bool   `json:"mailing"`
 	Timing     int    `json:"timing"`
