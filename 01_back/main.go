@@ -8,6 +8,7 @@ import (
 	"touban/email"
 	"touban/model"
 
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +17,7 @@ func main() {
 	model.DBConnect()
 
 	router := gin.Default()
+	router.Use(static.Serve("/touban-no-bannin", static.LocalFile("dist", false)))
 	router.GET("/touban", controller.GetTouban)
 	router.POST("/touban", controller.PostTouban)
 	router.PUT("/touban", controller.PutTouban)
