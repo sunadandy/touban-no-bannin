@@ -33,21 +33,29 @@ func main() {
 
 func DailyTask() {
 	for {
-		// 毎日23時にタスクが走るように設定(コンテナの手タイムゾーンがUTCなので9時間の誤差を考慮)
 		now := time.Now()
-		target := time.Date(now.Year(), now.Month(), now.Day(), 14, 50, 00, 0, time.Local)
+		// 毎日23時にタスクが走るように設定(コンテナのタイムゾーンがUTCなので9時間の誤差を考慮)
+		target := time.Date(now.Year(), now.Month(), now.Day(), 14, 45, 00, 0, time.Local)
+		// 目標時刻が現在よりも前（＝過去）の場合、1日加算して目標を翌日に設定
 		if target.Before(now) {
 			target = target.AddDate(0, 0, 1)
 		}
+		// 現在時刻と目標との差(duration)を取得
 		d := target.Sub(now)
+		// タイマーを設定して待機
 		timer := time.NewTimer(d)
 		<-timer.C
 
 		// 日付情報の更新
 		IsDateUpdateNeeded()
 
+		// 1分待機してからメールの配信
+		oneMinutes := time.Minute * 1
+		timer = time.NewTimer(oneMinutes)
+		<-timer.C
+
 		// メールの配信
-		email.ActionRemind()
+		email.Reminder()
 	}
 }
 
@@ -100,14 +108,19 @@ func CalcuNextDate(members model.Members, shedule string) string {
 	}
 	// 次回実施日計算
 	interval := strings.Split(shedule, "-")[0]
+	// 毎週
 	if interval == "1" {
 		date = maxDate.AddDate(0, 0, 7).Format("2006-01-02")
+		// 隔週
 	} else if interval == "2" {
 		date = maxDate.AddDate(0, 0, 14).Format("2006-01-02")
+		// ３週間毎
 	} else if interval == "3" {
 		date = maxDate.AddDate(0, 0, 21).Format("2006-01-02")
+		// １か月ごと
 	} else if interval == "4" {
 		date = maxDate.AddDate(0, 0, 28).Format("2006-01-02")
+		// 毎日
 	} else if interval == "0" {
 		// 金曜日かどうか判定
 		if maxDate.Weekday() == time.Friday {
