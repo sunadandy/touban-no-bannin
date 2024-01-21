@@ -13,8 +13,8 @@ module.exports = {
   // CORS(Access-Control-Allow-Origin)エラー対策。フロントとバックでOriginが異なる場合にエラー
   devServer: {
     host: "localhost",
-    port: 8081, //defaultは8080
-    proxy: 'http://192.168.226.46:3000',
-    // proxy: 'http://touban_b_cont:3000', //コンテナでnpm run serveするならこっちを有効化
+    port: 8081,
+    // proxy: 'http://172.18.52.226:3000',     //開発時有効化。eth0のipを記述
+    proxy: 'http://touban_b_cont:3000',  //コンテナでnpm run serveするならこっちを有効化
   }
 }
