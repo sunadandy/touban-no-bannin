@@ -76,10 +76,12 @@ export default {
           // 変更したメンバーの次回実施予定日設定
           const scheduling = this.current_toubanInfo.scheduling
           var data = scheduling.split("-")
-          var interval = parseInt(data[0])
-          const day = parseInt(data[1])
+          var newInterval = parseInt(data[0])
+          var newWeek = parseInt(data[1])
+          var newDay = parseInt(data[2])
+          var newDate = parseInt(data[3])
           var nextDate = this.current_toubanInfo.next
-          updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(updateMemberInfos, interval, day, nextDate)
+          updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(updateMemberInfos, newInterval, newWeek, newDay, newDate, nextDate)
           // 古いメンバー情報を削除
           this.axios.delete("/member", {params:{id: this.toubanId}})
           .then(response => {
