@@ -27,6 +27,9 @@ func main() {
 	router.PUT("/touban-no-bannin/member", controller.PutMember)
 	router.DELETE("/touban-no-bannin/member", controller.DeleteMember)
 
+	// リマインダーメール再送（未送信だった場合のみ）
+	email.Reminder()
+
 	go DailyTask()
 	router.Run(":3000")
 }
