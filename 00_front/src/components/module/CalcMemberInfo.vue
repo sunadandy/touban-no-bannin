@@ -172,7 +172,7 @@ export default {
         memberInfos.forEach((memberInfo) => {
           if(memberInfo.order_number == nextOrder){
             memberInfo.next = next
-            if(interval == 0){
+            if(newInterval == 0){
               var date = parse(next, 'yyyy-MM-dd', new Date())
               // 金曜日かどうか判定
               if(date.getDay()  == 5){
@@ -180,8 +180,8 @@ export default {
               }else{
                 next = format(addDays(date, 1), 'yyyy-MM-dd')
               }
-            }else if(interval >= 1 && interval <= 4){
-              next = format(startOfWeek(add(parse(next, 'yyyy-MM-dd', new Date()), { weeks: interval }), { weekStartsOn: day }), 'yyyy-MM-dd')
+            }else if(newInterval >= 1 && newInterval <= 4){
+              next = format(startOfWeek(add(parse(next, 'yyyy-MM-dd', new Date()), { weeks: newInterval }), { weekStartsOn: newDay }), 'yyyy-MM-dd')
             }
             nextOrder++
           }
@@ -191,7 +191,7 @@ export default {
         memberInfos.forEach((memberInfo) => {
           if(memberInfo.order_number <= lastOrder){
             memberInfo.next = next
-            if(interval == 0){
+            if(newInterval == 0){
               var date = parse(next, 'yyyy-MM-dd', new Date())
               // 金曜日かどうか判定
               if(date.getDay()  == 5){
@@ -199,8 +199,8 @@ export default {
               }else{
                 next = format(addDays(date, 1), 'yyyy-MM-dd')
               }
-            }else if(interval >= 1 && interval <= 4){
-              next = format(startOfWeek(add(parse(next, 'yyyy-MM-dd', new Date()), { weeks: interval }), { weekStartsOn: day }), 'yyyy-MM-dd')
+            }else if(newInterval >= 1 && newInterval <= 4){
+              next = format(startOfWeek(add(parse(next, 'yyyy-MM-dd', new Date()), { weeks: newInterval }), { weekStartsOn: newDay }), 'yyyy-MM-dd')
             }
             nextOrder++
           }
