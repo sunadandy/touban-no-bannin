@@ -76,10 +76,12 @@ export default {
           // 変更したメンバーの次回実施予定日設定
           const scheduling = this.current_toubanInfo.scheduling
           var data = scheduling.split("-")
-          var interval = parseInt(data[0])
-          const day = parseInt(data[1])
+          var newInterval = parseInt(data[0])
+          var newWeek = parseInt(data[1])
+          var newDay = parseInt(data[2])
+          var newDate = parseInt(data[3])
           var nextDate = this.current_toubanInfo.next
-          updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(updateMemberInfos, interval, day, nextDate)
+          updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(updateMemberInfos, newInterval, newWeek, newDay, newDate, nextDate)
           // 古いメンバー情報を削除
           this.axios.delete("/member", {params:{id: this.toubanId}})
           .then(response => {
@@ -96,10 +98,12 @@ export default {
           updateToubanInfo.scheduling = newScheduling
           updateToubanInfo.next = newStartDate
           // 次回実施日のリスケ
-          var data = newScheduling.split("-")
-          const newInterval = parseInt(data[0])
-          const newDay = parseInt(data[1])
-          var updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(this.current_memberInfos.sort((a, b) => a.order_number - b.order_number), newInterval, newDay, newStartDate)
+          var data = newScheduling.split("-")   //shedulingは間隔(sche)、週(week)、曜日(day)、日付(date)の順番
+          var newInterval = parseInt(data[0])
+          var newWeek = parseInt(data[1])
+          var newDay = parseInt(data[2])
+          var newDate = parseInt(data[3])
+          var updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(this.current_memberInfos.sort((a, b) => a.order_number - b.order_number), newInterval, newWeek, newDay, newDate, newStartDate)
           this.axios.put("/touban", updateToubanInfo)
           .then(response => {
             this.axios.put("/member", updateMemberInfos)
@@ -117,7 +121,7 @@ export default {
             console.log(response)
           }).catch(error => console.log(error))
           break
-          // 順番変更
+        // 順番変更
         case "option-5":
           var newOrder = this.result.data
           newOrder.forEach((element, index) => {
@@ -125,10 +129,12 @@ export default {
           });
           // 次回実施日のリスケ
           var sch = this.current_toubanInfo.scheduling.split("-")
-          var interval = parseInt(sch[0])
-          var date = parseInt(sch[1])
+          var newInterval = parseInt(sch[0])
+          var newWeek = parseInt(sch[1])
+          var newDay = parseInt(sch[2])
+          var newDate = parseInt(sch[3])
           var nextDate = this.current_toubanInfo.next
-          var updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(newOrder, interval, date, nextDate)
+          var updateMemberInfos = this.$refs.RefCaclcMemberInfo.ReSchedule(newOrder, newInterval, newWeek, newDay, newDate, nextDate)
           this.axios.put("/member", updateMemberInfos)
           .then(response => {
             console.log(response)

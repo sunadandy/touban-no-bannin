@@ -58,10 +58,6 @@ export default {
   },
   methods:{
     GetMailSetting(){
-      var cc = this.$refs.RefInputField.inputData
-      if(cc == null){cc = ""}
-      if(cc.endsWith(";")){cc = cc.slice(0, -1)}
-
       if(!this.model){
         return {
           mailing: this.model,
@@ -69,6 +65,9 @@ export default {
           cc: "",
         }
       }else{
+        var cc = this.$refs.RefInputField.inputData
+        if(cc == null){cc = ""}
+        if(cc.endsWith(";")){cc = cc.slice(0, -1)}
         return {
           mailing: this.model,
           timing: this.timing,
