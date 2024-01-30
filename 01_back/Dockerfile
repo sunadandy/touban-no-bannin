@@ -7,7 +7,7 @@ COPY . /go/src/app/
 COPY ./dist /go/src/app/dist
 
 RUN apt update
-RUN apt-get install -y vim
+RUN apt install -y vim
 RUN go mod tidy
 
 CMD [ "go","run","main.go" ]
