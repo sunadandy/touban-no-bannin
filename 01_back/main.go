@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"strconv"
 	"strings"
 	"time"
 	"touban/controller"
@@ -80,62 +81,75 @@ func IsDateUpdateNeeded() {
 		jsonData := model.ReadMemberByToubanId(touban.Id)
 		json.Unmarshal([]byte(jsonData), &stMembers)
 
-		// 次回実施日が今日の日付だったメンバーを探して最終実施日を更新
+		// 次回実施日が今日の日付だったメンバーを探して最終実施日と次回実施日を更新
+		var latestNextDate time.Time // 最遅次回実施日
+		var updatedMemberIdx int
 		for i, stMember := range stMembers {
+			// 次回実施日を格納して現在の最遅実施日と比較
+			next, _ := time.Parse("2006-01-02", stMember.Next)
+			if latestNextDate.IsZero() || next.After(latestNextDate) {
+				latestNextDate = next
+			}
+			// 最終実施日を今日に変更
 			if stMember.Next == today {
-				// 最終実施日を今日に変更
 				stMember.Last = today
-				// 次回実施日を設定
-				date := CalcuNextDate(stMembers, touban.Scheduling)
-				stMember.Next = date
-				DateUpdateMember(stMember)
-				// 次回実施日を当番の開始日に設定
-				touban.Start = stMembers[i+1].Next
-				DateUpdateTouban(touban)
-				break
+				updatedMemberIdx = i
 			}
 		}
+		// 次回実施日を設定
+		stMembers[updatedMemberIdx].Next = CalcuNextDate(latestNextDate, touban.Scheduling)
+		// データベース更新
+		DateUpdateMember(stMembers[updatedMemberIdx])
+		DateUpdateTouban(touban)
 	}
 }
 
-func CalcuNextDate(members model.Members, shedule string) string {
-	var date string
-	var maxDate time.Time
+func CalcuNextDate(latestNextDate time.Time, shedule string) string {
+	var nextDate string
+	now := time.Now()
 
-	// MAX次回実施日を取得
-	for _, member := range members {
-		next, _ := time.Parse("2006-01-02", member.Next)
-		if maxDate.IsZero() || next.After(maxDate) {
-			maxDate = next
-		}
-	}
 	// 次回実施日計算
 	interval := strings.Split(shedule, "-")[0]
+	week := strings.Split(shedule, "-")[1]
+	day := strings.Split(shedule, "-")[2]
+	date := strings.Split(shedule, "-")[3]
 	// 毎週
 	if interval == "1" {
-		date = maxDate.AddDate(0, 0, 7).Format("2006-01-02")
+		nextDate = latestNextDate.AddDate(0, 0, 7).Format("2006-01-02")
 		// 隔週
 	} else if interval == "2" {
-		date = maxDate.AddDate(0, 0, 14).Format("2006-01-02")
+		nextDate = latestNextDate.AddDate(0, 0, 14).Format("2006-01-02")
 		// ３週間毎
 	} else if interval == "3" {
-		date = maxDate.AddDate(0, 0, 21).Format("2006-01-02")
+		nextDate = latestNextDate.AddDate(0, 0, 21).Format("2006-01-02")
 		// １か月ごと
 	} else if interval == "4" {
-		date = maxDate.AddDate(0, 0, 28).Format("2006-01-02")
+		// 毎月指定日
+		if date != "0" {
+			// フロントエンドでの日付計算が正しい前提とすると、バックエンドでの毎月指定は1か月加算するだけでいい。
+			nextDate = latestNextDate.AddDate(0, 1, 0).Format("2006-01-02")
+		} else {
+			dayInt, _ := strconv.Atoi(day)
+			weekInt, _ := strconv.Atoi(week)
+			// 来月の初日を取得
+			firstDayOfNextMonth := time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, now.Location())
+			// 指定集の指定曜日の日付を算出
+			diff := dayInt - int(firstDayOfNextMonth.Weekday())
+			nextDate = firstDayOfNextMonth.AddDate(0, 0, 7*(weekInt-1)+diff).Format("2006-01-02")
+		}
 		// 毎日
 	} else if interval == "0" {
 		// 金曜日かどうか判定
-		if maxDate.Weekday() == time.Friday {
-			date = maxDate.AddDate(0, 0, 3).Format("2006-01-02")
+		if latestNextDate.Weekday() == time.Friday {
+			nextDate = latestNextDate.AddDate(0, 0, 3).Format("2006-01-02")
 		} else {
-			date = maxDate.AddDate(0, 0, 1).Format("2006-01-02")
+			nextDate = latestNextDate.AddDate(0, 0, 1).Format("2006-01-02")
 		}
 	} else {
-		date = maxDate.Format("2006-01-02")
+		nextDate = latestNextDate.Format("2006-01-02")
 	}
 
-	return date
+	return nextDate
 }
 
 func DateUpdateMember(accessM controller.AccessMember) int64 {

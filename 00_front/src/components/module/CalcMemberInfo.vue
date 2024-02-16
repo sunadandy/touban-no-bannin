@@ -94,15 +94,14 @@ export default {
         // nextで指定された月の最後の曜日を取得(0から6の整数で、日曜日から土曜日までの順)
         const endDayOfNextMonth = endOfMonth(nextMonth).getDay();
         
-        // newDayが月初めの曜日よりも前の場合は第2週の曜日を設定
-        if (newWeek == 1 && firstDayOfNextMonth > newDay) {
-          return format(nextMonth.setDate(7 - firstDayOfNextMonth + newDay + 1), 'yyyy-MM-dd');
-        } else if (newWeek == 1 && firstDayOfNextMonth <= newDay && 6 >= newDay) {    //第1週の成立条件
-          return format(nextMonth.setDate(newDay - firstDayOfNextMonth + 1), 'yyyy-MM-dd');                 //日曜が0だとすると月初めが日曜日の場合を考えると+1になる。
-        } else if (newWeek == 5 && endDayOfNextMonth < newDay) {                      //newDayが月終わりの曜日よりも後の場合は前週の曜日を設定
-          return format(nextMonth.setDate(endOfMonth(nextMonth).getDate() - 7 + (newDay - endDayOfNextMonth)), 'yyyy-MM-dd');
+        if(newWeek == 1){
+          // newDayが月初めの曜日よりも前の場合は7日オフセット
+          return format(nextMonth.setDate((firstDayOfNextMonth > newDay ? 7 : 0) + (newDay - firstDayOfNextMonth) + 1), 'yyyy-MM-dd');
+        } else if (newWeek == 5) {
+          //newDayが月終わりの曜日よりも後の場合は前週の曜日を設定
+          return format(nextMonth.setDate(endOfMonth(nextMonth).getDate() - (endDayOfNextMonth < newDay ? 7 : 0) - (endDayOfNextMonth - newDay)), 'yyyy-MM-dd');
         } else {
-          return format(nextMonth.setDate((newWeek - 1) * 7 + (newDay - firstDayOfNextMonth) + 1 + (firstDayOfNextMonth > newDay ? 7 : 0)), 'yyyy-MM-dd');
+          return format(nextMonth.setDate((newWeek * 7 - 6) + (newDay - firstDayOfNextMonth)), 'yyyy-MM-dd');
         }
       }
 
