@@ -20,21 +20,21 @@
           <v-radio label="木曜" value=4></v-radio>
           <v-radio label="金曜" value=5></v-radio>
         </v-radio-group>
-        <v-radio-group v-model="dayOrWeek" inline v-if="scheValue == 4">
+        <v-radio-group v-model="dateOrDay" inline v-if="scheValue == 4">
           <v-radio label="日付指定" value=0></v-radio>
           <v-radio label="曜日指定" value=1></v-radio>
         </v-radio-group>
       </div>
       <div>
-        <v-select label="日付選択" :items="items" v-if="dayOrWeek == 0" v-model="dateValue"></v-select>
-        <v-radio-group label="何週目に設定しますか？" v-model="weekValue" inline v-if="dayOrWeek == 1">
+        <v-select label="日付選択" :items="items" v-if="dateOrDay == 0" v-model="dateValue"></v-select>
+        <v-radio-group label="何週目に設定しますか？" v-model="weekValue" inline v-if="dateOrDay == 1">
           <v-radio label="第1週" value=1></v-radio>
           <v-radio label="第2週" value=2></v-radio>
           <v-radio label="第3週" value=3></v-radio>
           <v-radio label="第4週" value=4></v-radio>
           <v-radio label="第5週" value=5></v-radio>
         </v-radio-group>
-        <v-radio-group label="何曜日に設定しますか？" v-model="dayValue" inline v-if="dayOrWeek == 1">
+        <v-radio-group label="何曜日に設定しますか？" v-model="dayValue" inline v-if="dateOrDay == 1">
           <!-- 日曜日を0スタートにすること -->
           <v-radio label="月曜" value=1></v-radio>
           <v-radio label="火曜" value=2></v-radio>
@@ -53,10 +53,10 @@ export default {
   data(){
     return {
       scheValue: 1,
-      dateValue: 1,
+      dateValue: 0,
       dayValue: 1,
       weekValue: 0,
-      dayOrWeek: -1,
+      dateOrDay: -1,
       items: Array.from(Array(31), (_, i) => i + 1),
     }
   },
