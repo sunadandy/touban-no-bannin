@@ -78,32 +78,54 @@ export default {
 
       return memberInfos
     },
-    ReSchedule(memberInfos, newInterval, newWeek, newDay, newDate, nextDate){
-      const today = format(startOfToday(), 'yyyy-MM-dd')
-
-      function getNextDate(currentDate, increment) {
-        const date = parse(currentDate, 'yyyy-MM-dd', new Date());
-        return format(addDays(date, increment), 'yyyy-MM-dd');
+    // 毎月の指定週の指定曜日を計算する関数
+    _GetNextMonthDay(currentDate, newWeek, newDay) {
+      const date = parse(currentDate, 'yyyy-MM-dd', new Date());
+      // nextで指定された月の最初の曜日を取得(0から6の整数で、日曜日から土曜日までの順)
+      const nextMonth = addMonths(date, 1);
+      const firstDayOfNextMonth = startOfMonth(nextMonth).getDay();
+      
+      if(newDay < firstDayOfNextMonth && newWeek == 1){
+        newWeek = 2
       }
-
-      function getNextMonthDate(currentDate, newWeek, newDay) {
-        const date = parse(currentDate, 'yyyy-MM-dd', new Date());
-        // nextで指定された月の最初の曜日を取得(0から6の整数で、日曜日から土曜日までの順)
-        const nextMonth = addMonths(date, 1);
-        const firstDayOfNextMonth = startOfMonth(nextMonth).getDay();
-        // nextで指定された月の最後の曜日を取得(0から6の整数で、日曜日から土曜日までの順)
-        const endDayOfNextMonth = endOfMonth(nextMonth).getDay();
-        
-        if(newWeek == 1){
-          // newDayが月初めの曜日よりも前の場合は7日オフセット
-          return format(nextMonth.setDate((firstDayOfNextMonth > newDay ? 7 : 0) + (newDay - firstDayOfNextMonth) + 1), 'yyyy-MM-dd');
-        } else if (newWeek == 5) {
-          //newDayが月終わりの曜日よりも後の場合は前週の曜日を設定
-          return format(nextMonth.setDate(endOfMonth(nextMonth).getDate() - (endDayOfNextMonth < newDay ? 7 : 0) - (endDayOfNextMonth - newDay)), 'yyyy-MM-dd');
-        } else {
-          return format(nextMonth.setDate((newWeek * 7 - 6) + (newDay - firstDayOfNextMonth)), 'yyyy-MM-dd');
+      return format(nextMonth.setDate(newWeek* 7 + (newDay - firstDayOfNextMonth - 7) + 1), 'yyyy-MM-dd')
+    },
+    _GetNextMonthSpecifiedDate(next, newDate){
+      const date = parse(next, 'yyyy-MM-dd', new Date())
+      date.setDate(newDate)
+      return format(addMonths(date, 1), 'yyyy-MM-dd')
+    },
+    // 指定日からのオフセット日付を計算する関数
+    _GetNextDateByIncrementWeek(currentDate, increment){
+      const date = parse(currentDate, 'yyyy-MM-dd', new Date());
+      return format(addDays(date, increment), 'yyyy-MM-dd');
+    },
+    _GetNextWorkingDate(next){
+      const date = parse(next, 'yyyy-MM-dd', new Date())
+      // 金曜日かどうか判定
+      if(date.getDay() == 5){
+        return format(addDays(date, 3), 'yyyy-MM-dd')
+      }else{
+        return format(addDays(date, 1), 'yyyy-MM-dd')
+      }
+    },
+    _GetNextDatePerInterval(newInterval, newWeek, newDay, newDate){
+      // 平日毎日
+      if(newInterval == 0){
+        return _GetNextWorkingDate(next);
+      }else if(newInterval >= 1 && newInterval <= 3){ //毎週、隔週、3週毎
+        return _GetNextDateByIncrementWeek(next, newInterval*7)
+      }else if(newInterval == 4){ //毎月
+        // 曜日指定
+        if(newWeek != 0){
+          return _GetNextMonthDay(next, newWeek, newDay);
+        }else{  //日付指定
+          return _GetNextMonthSpecifiedDate(next, newDate);
         }
       }
+    },
+    ReSchedule(memberInfos, newInterval, newWeek, newDay, newDate, nextDate){
+      const today = format(startOfToday(), 'yyyy-MM-dd')
 
       // 今日の日付に一番近い最終実施日のインデックスを検索する（順番入れ替えを考慮するとlastは必ずしも昇順ではない。）
       // reduceは、コールバック関数と初期値を引数に持つ。初期値はコールバック関数の第1引数
@@ -129,31 +151,7 @@ export default {
       if(closestLastDateIndex == memberInfos.length){
         memberInfos.forEach(memberInfo => {
           memberInfo.next = next
-          // 平日毎日
-          if(newInterval == 0){
-            const date = parse(next, 'yyyy-MM-dd', new Date())
-            // 金曜日かどうか判定
-            if(date.getDay() == 5){
-              next = format(addDays(date, 3), 'yyyy-MM-dd')
-            }else{
-              next = format(addDays(date, 1), 'yyyy-MM-dd')
-            }
-          }else if(newInterval >= 1 && newInterval <= 3){ //毎週、隔週、3週毎
-            next = getNextDate(next, newInterval*7)
-          }else if(newInterval == 4){ //毎月
-            // 曜日指定
-            if(newWeek != 0){
-              next = getNextMonthDate(next, newWeek, newDay);
-            }else{  //日付指定
-              // [todo]newDateの更新は1回でいいはずだが、初回だけ今日の日付にする必要があるので多分こうなる。
-              // nextをdateオブジェクトに変更
-              const date = parse(next, 'yyyy-MM-dd', new Date())
-              // 日付をnewDateに上書き
-              date.setDate(newDate)
-              // 毎月決まった日を当番に設定する。土日祝日は考慮されない。
-              next = format(addMonths(date, 1), 'yyyy-MM-dd')
-            }
-          }
+          next = _GetNextDatePerInterval(newInterval, newWeek, newDay, newDate)
         })
       }else{
         // memberInfos[closestLastDateIndex].orderの次のorderから順次リスケ
@@ -164,26 +162,7 @@ export default {
         memberInfos.forEach((memberInfo) => {
           if(memberInfo.order_number == nextOrder){
             memberInfo.next = next
-            if(newInterval == 0){
-              const date = parse(next, 'yyyy-MM-dd', new Date())
-              // 金曜日かどうか判定
-              if(date.getDay()  == 5){
-                next = format(addDays(date, 3), 'yyyy-MM-dd')
-              }else{
-                next = format(addDays(date, 1), 'yyyy-MM-dd')
-              }
-            }else if(newInterval >= 1 && newInterval <= 3){ //毎週、隔週、3週毎
-              next = getNextDate(next, newInterval*7)
-            }else if(newInterval == 4){ //毎月
-              // 曜日指定
-              if(newWeek != 0){
-                next = getNextMonthDate(next, newWeek, newDay);
-              }else{  //日付指定
-                const date = parse(next, 'yyyy-MM-dd', new Date())
-                date.setDate(newDate)
-                next = format(addMonths(date, 1), 'yyyy-MM-dd')
-              }
-            }
+            next = _GetNextDatePerInterval(newInterval, newWeek, newDay, newDate)
             nextOrder++
           }
         })
@@ -192,26 +171,7 @@ export default {
         memberInfos.forEach((memberInfo) => {
           if(memberInfo.order_number <= lastOrder){
             memberInfo.next = next
-            if(newInterval == 0){
-              const date = parse(next, 'yyyy-MM-dd', new Date())
-              // 金曜日かどうか判定
-              if(date.getDay()  == 5){
-                next = format(addDays(date, 3), 'yyyy-MM-dd')
-              }else{
-                next = format(addDays(date, 1), 'yyyy-MM-dd')
-              }
-            }else if(newInterval >= 1 && newInterval <= 3){
-              next = getNextDate(next, newInterval*7)
-            }else if(newInterval == 4){ //毎月
-              // 曜日指定
-              if(newWeek != 0){
-                next = getNextMonthDate(next, newWeek, newDay);
-              }else{  //日付指定
-                const date = parse(next, 'yyyy-MM-dd', new Date())
-                date.setDate(newDate)
-                next = format(addMonths(date, 1), 'yyyy-MM-dd')
-              }
-            }
+            next = _GetNextDatePerInterval(newInterval, newWeek, newDay, newDate)
             nextOrder++
           }
         })
