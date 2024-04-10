@@ -109,18 +109,18 @@ export default {
         return format(addDays(date, 1), 'yyyy-MM-dd')
       }
     },
-    _GetNextDatePerInterval(newInterval, newWeek, newDay, newDate){
+    _GetNextDatePerInterval(next, newInterval, newWeek, newDay, newDate){
       // 平日毎日
       if(newInterval == 0){
-        return _GetNextWorkingDate(next);
+        return this._GetNextWorkingDate(next);
       }else if(newInterval >= 1 && newInterval <= 3){ //毎週、隔週、3週毎
-        return _GetNextDateByIncrementWeek(next, newInterval*7)
+        return this._GetNextDateByIncrementWeek(next, newInterval*7)
       }else if(newInterval == 4){ //毎月
         // 曜日指定
         if(newWeek != 0){
-          return _GetNextMonthDay(next, newWeek, newDay);
+          return this._GetNextMonthDay(next, newWeek, newDay);
         }else{  //日付指定
-          return _GetNextMonthSpecifiedDate(next, newDate);
+          return this._GetNextMonthSpecifiedDate(next, newDate);
         }
       }
     },
@@ -151,7 +151,7 @@ export default {
       if(closestLastDateIndex == memberInfos.length){
         memberInfos.forEach(memberInfo => {
           memberInfo.next = next
-          next = _GetNextDatePerInterval(newInterval, newWeek, newDay, newDate)
+          next = this._GetNextDatePerInterval(next, newInterval, newWeek, newDay, newDate)
         })
       }else{
         // memberInfos[closestLastDateIndex].orderの次のorderから順次リスケ
@@ -162,7 +162,7 @@ export default {
         memberInfos.forEach((memberInfo) => {
           if(memberInfo.order_number == nextOrder){
             memberInfo.next = next
-            next = _GetNextDatePerInterval(newInterval, newWeek, newDay, newDate)
+            next = this._GetNextDatePerInterval(next, newInterval, newWeek, newDay, newDate)
             nextOrder++
           }
         })
@@ -171,7 +171,7 @@ export default {
         memberInfos.forEach((memberInfo) => {
           if(memberInfo.order_number <= lastOrder){
             memberInfo.next = next
-            next = _GetNextDatePerInterval(newInterval, newWeek, newDay, newDate)
+            next = this._GetNextDatePerInterval(next, newInterval, newWeek, newDay, newDate)
             nextOrder++
           }
         })
