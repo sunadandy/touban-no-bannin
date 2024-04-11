@@ -90,14 +90,15 @@ func IsDateUpdateNeeded() {
 			if latestNextDate.IsZero() || next.After(latestNextDate) {
 				latestNextDate = next
 			}
-			// 最終実施日を今日に変更
+			// 更新対象メンバーのインデックス取得
 			if stMember.Next == today {
-				stMember.Last = today
 				updatedMemberIdx = i
 			}
 		}
 		// 次回実施日を設定
 		stMembers[updatedMemberIdx].Next = CalcuNextDate(latestNextDate, touban.Scheduling)
+		// 最終実施日を設定
+		stMembers[updatedMemberIdx].Last = today
 		// データベース更新
 		DateUpdateMember(stMembers[updatedMemberIdx])
 		DateUpdateTouban(touban)
