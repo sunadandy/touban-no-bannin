@@ -81,28 +81,41 @@ func IsDateUpdateNeeded() {
 		jsonData := model.ReadMemberByToubanId(touban.Id)
 		json.Unmarshal([]byte(jsonData), &stMembers)
 
-		// 次回実施日が今日の日付だったメンバーを探して最終実施日と次回実施日を更新
-		var latestNextDate time.Time // 最遅次回実施日
-		var updatedMemberIdx int
+		// 次回実施日が今日の日付だったメンバーのインデックスを取得
+		var idx int = -1
+		var nextDateArray []string
 		for i, stMember := range stMembers {
-			// 次回実施日を格納して現在の最遅実施日と比較
-			next, _ := time.Parse("2006-01-02", stMember.Next)
-			if latestNextDate.IsZero() || next.After(latestNextDate) {
-				latestNextDate = next
-			}
+			nextDateArray = append(nextDateArray, stMember.Next)
 			// 更新対象メンバーのインデックス取得
 			if stMember.Next == today {
-				updatedMemberIdx = i
+				idx = i
 			}
 		}
-		// 次回実施日を設定
-		stMembers[updatedMemberIdx].Next = CalcuNextDate(latestNextDate, touban.Scheduling)
-		// 最終実施日を設定
-		stMembers[updatedMemberIdx].Last = today
-		// データベース更新
-		DateUpdateMember(stMembers[updatedMemberIdx])
-		DateUpdateTouban(touban)
+		if idx != -1 {
+			// 現在の最遅次回実施日取得
+			latestNextDate := GetLatestNextDate(nextDateArray)
+			// 次回実施日を設定
+			stMembers[idx].Next = CalcuNextDate(latestNextDate, touban.Scheduling)
+			// 最終実施日を設定
+			stMembers[idx].Last = today
+			// データベース更新
+			DateUpdateMember(stMembers[idx])
+			DateUpdateTouban(touban)
+		}
 	}
+}
+
+func GetLatestNextDate(nextDateArray []string) time.Time{
+	latestNextDate := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)// 最遅次回実施日。値は初期値
+	// nextDate同士をループで比較して最遅次回実施日を求める
+	for _, date := range nextDateArray{
+		nextDate, _ := time.Parse("2006-01-02", date)
+		fmt.Print(nextDate)
+		if nextDate.After(latestNextDate) {
+			latestNextDate = nextDate
+		}
+	}
+	return latestNextDate
 }
 
 func CalcuNextDate(latestNextDate time.Time, shedule string) string {
