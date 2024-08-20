@@ -305,7 +305,7 @@ export default {
 .multiselectable select {
   float: left;
   height: 500px;
-  width: 400px;
+  width: 600px;
   border-width: 1px;
   border-style: solid;
   border-color:slategrey;
@@ -313,7 +313,7 @@ export default {
 .multiselectable div {
   float: left;
   height: auto;
-  width: 400px;
+  width: 600px;
   font-weight: bold;
   color: slategray;
 }

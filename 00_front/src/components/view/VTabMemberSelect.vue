@@ -7,8 +7,8 @@
       multiple="multiple"
       size="20"
     >
-      <option v-for="item in selectable" :key="item.employeeNo">{{ item.affiliation }},{{ item.name }}</option>
-      <option v-for="item in currentMemberInfo" :key="item.employeeNo" selected>{{ item.affiliation }},{{ item.name }}</option>
+      <option v-for="item in selectable" :key="item.employeeNo">{{ item.name }}, {{ item.affiliation }}</option>
+      <option v-for="item in currentMemberInfo" :key="item.employeeNo" selected>{{ item.name }}, {{ item.affiliation }}</option>
     </select>
   </div>
 </template>
@@ -40,11 +40,12 @@ export default {
     GetSelected(){
       const selected = document.getElementById("m-selected")
       var jsonArray = []
+      const userNameElementNumber = 0
       for ( var i=0,l=selected.length; l>i; i++ ) {
         for(var j=0; j < this.userData.length; j++){
           // 必ずどこかで一致する
           const value = selected[i].value
-          const name = value.split(",")[1]
+          const name = value.split(",")[userNameElementNumber]
           if(name == this.userData[j].name){
             jsonArray.push(this.userData[j])
             break
