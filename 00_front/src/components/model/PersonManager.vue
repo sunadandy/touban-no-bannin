@@ -4,7 +4,7 @@
 </template>
   
 <script>
-import csvData from "@/assets/address.csv"
+import csvData from "@/assets/部内リスト.csv"
 
 export default {
   name: 'PersonManager',
@@ -17,10 +17,10 @@ export default {
   mounted(){
     for(var i=0, l=this.csvData.length; i < l; i++){
       var item = {}
-      item["affiliation"] = this.csvData[i][3]
-      item["emplyoeeNo"] = this.csvData[i][4]
-      item["name"] = this.csvData[i][5]
-      item["email"] = this.csvData[i][7]
+      item["affiliation"] = this.csvData[i][4]
+      item["emplyoeeNo"] = this.csvData[i][2]
+      item["name"] = this.csvData[i][0]
+      item["email"] = this.csvData[i][3]
       this.userData.push(item)
     }
   }

@@ -110,7 +110,6 @@ func GetLatestNextDate(nextDateArray []string) time.Time{
 	// nextDate同士をループで比較して最遅次回実施日を求める
 	for _, date := range nextDateArray{
 		nextDate, _ := time.Parse("2006-01-02", date)
-		fmt.Print(nextDate)
 		if nextDate.After(latestNextDate) {
 			latestNextDate = nextDate
 		}

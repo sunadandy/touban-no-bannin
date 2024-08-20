@@ -1,7 +1,7 @@
 <template>
   <div class="top">
     <div class="inner">
-      <img src="./../assets/logo.jpg" @click="RingAudio()">
+      <img src="./../assets/logo.jpg" @click="AppEnter()">
     </div>
     <div class="caution">画像をクリックすると次に進みます。(なお、音が鳴るので注意！)</div>
   </div>
@@ -10,13 +10,8 @@
 <script>
 export default {
   name: 'TopView',
-  data: () => ({
-  audio: new Audio(require('@/assets/バーン.mp3'))
-  }),
   methods: {
-    RingAudio: function() {
-      this.audio.currentTime = 0 // 連続で鳴らせるように
-      // this.audio.play() // 鳴らす
+    AppEnter: function() {
       this.$router.push("/home")
     },
   }
