@@ -25,13 +25,33 @@
         <tbody>
           <tr
             class="text-center"
-            v-for="m in member" :key="m.order_number"
+            v-for="(m, index) in member" :key="m.order_number"
             v-bind:class="m.name == owner ? 'coloring' : ''"
           >
             <td>{{ m.order_number }}</td>
             <td>{{ m.name }}</td>
-            <td>{{ m.next }}</td>
-            <td>{{ m.last }}</td>
+            <td v-if="editingCell.row!==index || editingCell.key!=='next'" @click="edit(index, m.name, 'next', m.next)">{{ m.next }}</td>
+            <td v-else>
+              <v-text-field
+                v-model="editingCell.value"
+                @blur="save(index)"
+                @keydown.enter="save(index)"
+                class="w-100"
+                :rules="[dateRules]"
+                autofocus
+              ></v-text-field>
+            </td>
+            <td v-if="editingCell.row!==index || editingCell.key!=='last'" @click="edit(index, m.name, 'last', m.last)">{{ m.last }}</td>
+            <td v-else>
+              <v-text-field
+                v-model="editingCell.value"
+                @blur="save(index)"
+                @keydown.enter="save(index)"
+                class="w-100"
+                :rules="[dateRules]"
+                autofocus
+                ></v-text-field>
+            </td>
           </tr>
         </tbody>
       </v-table>
@@ -50,7 +70,12 @@ export default {
     return {
       member: [],
       owner: "",
-      message: ""
+      message: "",
+      editingCell: {row:-1, name:"", key:"", value: ""}, //編集中のセルの管理
+      dateRules: (value) => {
+        const pattern = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
+        return pattern.test(value) || "yyyy-mm-dd形式で入力してください";
+      },
     }
   },
   created(){
@@ -71,7 +96,33 @@ export default {
         // メンバーの取得
         this.member = member.sort((a, b) => a.order_number - b.order_number)
       })
-  }
+  },
+  methods:{
+    edit(index, name, key, value){
+      // 編集モードに入る際にもとの値を保持
+      this.editingCell = {row: index, name:name, key:key, value:value};
+    },
+    save(index){
+      // 保存された値が修正前と異なる場合はデータを更新して、DBも更新
+      if((this.member[index][this.editingCell.key] != this.editingCell.value) && this.dateRules(this.editingCell.value) == true){
+        // 値の更新
+        this.member[index][this.editingCell.key] = this.editingCell.value
+        // DB更新（変更した行だけputすればいいのだが、APIがメンバーリスト全体になっているので・・・・）
+        this.axios
+          .put("/member", this.member)
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => console.log(error));
+      }else{
+        // 元の値に戻す
+        this.editingCell.value = this.member[index][this.editingCell.key]
+      }
+
+      // セル初期化
+      this.editingCell = {row: -1, name:"", key:"", value:""};
+    },
+  },
 }
 </script>
 
