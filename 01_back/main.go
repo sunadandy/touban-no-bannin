@@ -105,10 +105,10 @@ func IsDateUpdateNeeded() {
 	}
 }
 
-func GetLatestNextDate(nextDateArray []string) time.Time{
-	latestNextDate := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)// 最遅次回実施日。値は初期値
+func GetLatestNextDate(nextDateArray []string) time.Time {
+	latestNextDate := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC) // 最遅次回実施日。値は初期値
 	// nextDate同士をループで比較して最遅次回実施日を求める
-	for _, date := range nextDateArray{
+	for _, date := range nextDateArray {
 		nextDate, _ := time.Parse("2006-01-02", date)
 		if nextDate.After(latestNextDate) {
 			latestNextDate = nextDate
@@ -119,7 +119,6 @@ func GetLatestNextDate(nextDateArray []string) time.Time{
 
 func CalcuNextDate(latestNextDate time.Time, shedule string) string {
 	var nextDate string
-	now := time.Now()
 
 	// 次回実施日計算
 	interval := strings.Split(shedule, "-")[0]
@@ -144,8 +143,8 @@ func CalcuNextDate(latestNextDate time.Time, shedule string) string {
 		} else {
 			dayInt, _ := strconv.Atoi(day)
 			weekInt, _ := strconv.Atoi(week)
-			// 来月の初日を取得
-			firstDayOfNextMonth := time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, now.Location())
+			// 最遅次回実施日の翌月の初日を取得
+			firstDayOfNextMonth := time.Date(latestNextDate.Year(), latestNextDate.Month()+1, 1, 0, 0, 0, 0, latestNextDate.Location())
 			// 指定集の指定曜日の日付を算出
 			diff := dayInt - int(firstDayOfNextMonth.Weekday())
 			nextDate = firstDayOfNextMonth.AddDate(0, 0, 7*(weekInt-1)+diff).Format("2006-01-02")
